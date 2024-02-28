@@ -69,9 +69,9 @@ class rvm_valve():
         self.home()
 
     def __enter__(self):
-        pass
+        return self
 
-    def __exit__(self):
+    def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
     def close(self):

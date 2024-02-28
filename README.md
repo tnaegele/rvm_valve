@@ -21,6 +21,7 @@ with rvm_valve.rvm_valve('COM7') as valve:
 - add proper handling of responses from valve with method `_handle_reply()`
 - make `get_valve_position()` method functional
 - test whether the driver works with Elveflows MUX
+- write port autodetection function
 
 ## Useful links
 - rotary valve manual: https://amf.ch/app/uploads/2023/09/AMF-RVM-Electric-Rotary-Valve-Operating-Manual.pdf

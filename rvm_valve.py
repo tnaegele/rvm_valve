@@ -167,7 +167,7 @@ class rvm_valve():
             Desired channel position.
         
         direction : int, optional
-            0 - shortest path,  1 - incrememtal, 2 - decremental. The default is 0.
+            0: shortest path,  1: incrememtal, 2: decremental. The default is 0.
 
         Returns
         -------

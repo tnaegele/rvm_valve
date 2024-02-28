@@ -84,7 +84,7 @@ class rvm_valve():
         logging.info('MUX connection closed')
         return 0
 
-    def execute(self, command):
+    def _execute(self, command):
         '''
         Send command to valve.
 

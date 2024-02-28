@@ -33,6 +33,9 @@
                                 <a class="variable" href="#rvm_valve.valve">valve</a>
                         </li>
                         <li>
+                                <a class="variable" href="#rvm_valve.number_of_ports">number_of_ports</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#rvm_valve.current_valve_position">current_valve_position</a>
                         </li>
                         <li>
@@ -144,7 +147,7 @@ SOFTWARE.</p>
 </span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="w">    </span><span class="sd">'''</span>
 </span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="sd">    This driver controls OEM AVM rotary valves from Advanced Microfluidics.</span>
 </span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="sd">    '''</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">number_of_ports</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
 </span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a><span class="w">        </span><span class="sd">'''</span>
 </span><span id="L-50"><a href="#L-50"><span class="linenos"> 50</span></a><span class="sd">        Initialise valve control</span>
 </span><span id="L-51"><a href="#L-51"><span class="linenos"> 51</span></a>
@@ -152,156 +155,160 @@ SOFTWARE.</p>
 </span><span id="L-53"><a href="#L-53"><span class="linenos"> 53</span></a><span class="sd">        ----------</span>
 </span><span id="L-54"><a href="#L-54"><span class="linenos"> 54</span></a><span class="sd">        port : str</span>
 </span><span id="L-55"><a href="#L-55"><span class="linenos"> 55</span></a><span class="sd">            Port of valve, e.g. 'COM2' on Windows or device path of Linux / MacOS</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a>
-</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="sd">        Returns</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="sd">        -------</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a><span class="sd">        None.</span>
-</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a>
-</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="sd">        '''</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">valve</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="mi">9600</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'connected to RVM valve </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_valve_position</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># keeps track of the valve position</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">home</span><span class="p">()</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>
-</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>        <span class="k">pass</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>
-</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>
-</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a><span class="w">        </span><span class="sd">'''</span>
-</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a><span class="sd">        Closes connection to valve.</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos"> 56</span></a><span class="sd">            </span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos"> 57</span></a><span class="sd">        number_of_ports : int, optional</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos"> 58</span></a><span class="sd">            Number of valve ports. The default is 12.</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos"> 59</span></a>
+</span><span id="L-60"><a href="#L-60"><span class="linenos"> 60</span></a><span class="sd">        Returns</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos"> 61</span></a><span class="sd">        -------</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos"> 62</span></a><span class="sd">        None.</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos"> 63</span></a>
+</span><span id="L-64"><a href="#L-64"><span class="linenos"> 64</span></a><span class="sd">        '''</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos"> 65</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">valve</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="mi">9600</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos"> 66</span></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'connected to RVM valve </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos"> 67</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_ports</span> <span class="o">=</span> <span class="n">number_of_ports</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos"> 68</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_valve_position</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># keeps track of the valve position</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos"> 69</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">home</span><span class="p">()</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos"> 70</span></a>
+</span><span id="L-71"><a href="#L-71"><span class="linenos"> 71</span></a>    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos"> 72</span></a>        <span class="k">pass</span>
+</span><span id="L-73"><a href="#L-73"><span class="linenos"> 73</span></a>
+</span><span id="L-74"><a href="#L-74"><span class="linenos"> 74</span></a>    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos"> 75</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </span><span id="L-76"><a href="#L-76"><span class="linenos"> 76</span></a>
-</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a><span class="sd">        Returns</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="sd">        -------</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="sd">        int</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a><span class="sd">            0 if executed successfully.</span>
-</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a>
-</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="sd">        '''</span>
-</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'MUX connection closed'</span><span class="p">)</span>
-</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>        <span class="k">return</span> <span class="mi">0</span>
-</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a>
-</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>    <span class="k">def</span> <span class="nf">_execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
-</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a><span class="w">        </span><span class="sd">'''</span>
-</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a><span class="sd">        Send command to valve.</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos"> 77</span></a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-78"><a href="#L-78"><span class="linenos"> 78</span></a><span class="w">        </span><span class="sd">'''</span>
+</span><span id="L-79"><a href="#L-79"><span class="linenos"> 79</span></a><span class="sd">        Closes connection to valve.</span>
+</span><span id="L-80"><a href="#L-80"><span class="linenos"> 80</span></a>
+</span><span id="L-81"><a href="#L-81"><span class="linenos"> 81</span></a><span class="sd">        Returns</span>
+</span><span id="L-82"><a href="#L-82"><span class="linenos"> 82</span></a><span class="sd">        -------</span>
+</span><span id="L-83"><a href="#L-83"><span class="linenos"> 83</span></a><span class="sd">        int</span>
+</span><span id="L-84"><a href="#L-84"><span class="linenos"> 84</span></a><span class="sd">            0 if executed successfully.</span>
+</span><span id="L-85"><a href="#L-85"><span class="linenos"> 85</span></a>
+</span><span id="L-86"><a href="#L-86"><span class="linenos"> 86</span></a><span class="sd">        '''</span>
+</span><span id="L-87"><a href="#L-87"><span class="linenos"> 87</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span id="L-88"><a href="#L-88"><span class="linenos"> 88</span></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'MUX connection closed'</span><span class="p">)</span>
+</span><span id="L-89"><a href="#L-89"><span class="linenos"> 89</span></a>        <span class="k">return</span> <span class="mi">0</span>
 </span><span id="L-90"><a href="#L-90"><span class="linenos"> 90</span></a>
-</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a><span class="sd">        Parameters</span>
-</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="sd">        ----------</span>
-</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="sd">        command : str</span>
-</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a><span class="sd">            Command as outlined in manual.</span>
-</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a>
-</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">        Returns</span>
-</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">        -------</span>
-</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="sd">        int</span>
-</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a><span class="sd">            0 if executed successfully.</span>
-</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a>
-</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="sd">        '''</span>
-</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a>        <span class="n">command_string</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
-</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a>            <span class="s1">'/1'</span> <span class="o">+</span> <span class="n">command</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\r</span><span class="s1">'</span><span class="p">)</span>  <span class="c1"># add prefix and suffix and convert to bytes</span>
-</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'MUX write </span><span class="si">{</span><span class="n">command_string</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">command_string</span><span class="p">)</span>
-</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>        <span class="n">reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serial_read</span><span class="p">()</span>  <span class="c1"># read reply from valve</span>
-</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_handle_reply</span><span class="p">(</span><span class="n">reply</span><span class="p">)</span>
-</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>        <span class="k">return</span> <span class="mi">0</span>
-</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>
-</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>    <span class="k">def</span> <span class="nf">_serial_read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a><span class="w">        </span><span class="sd">'''</span>
-</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a><span class="sd">        Reads replies from valve</span>
+</span><span id="L-91"><a href="#L-91"><span class="linenos"> 91</span></a>    <span class="k">def</span> <span class="nf">_execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
+</span><span id="L-92"><a href="#L-92"><span class="linenos"> 92</span></a><span class="w">        </span><span class="sd">'''</span>
+</span><span id="L-93"><a href="#L-93"><span class="linenos"> 93</span></a><span class="sd">        Send command to valve.</span>
+</span><span id="L-94"><a href="#L-94"><span class="linenos"> 94</span></a>
+</span><span id="L-95"><a href="#L-95"><span class="linenos"> 95</span></a><span class="sd">        Parameters</span>
+</span><span id="L-96"><a href="#L-96"><span class="linenos"> 96</span></a><span class="sd">        ----------</span>
+</span><span id="L-97"><a href="#L-97"><span class="linenos"> 97</span></a><span class="sd">        command : str</span>
+</span><span id="L-98"><a href="#L-98"><span class="linenos"> 98</span></a><span class="sd">            Command as outlined in manual.</span>
+</span><span id="L-99"><a href="#L-99"><span class="linenos"> 99</span></a>
+</span><span id="L-100"><a href="#L-100"><span class="linenos">100</span></a><span class="sd">        Returns</span>
+</span><span id="L-101"><a href="#L-101"><span class="linenos">101</span></a><span class="sd">        -------</span>
+</span><span id="L-102"><a href="#L-102"><span class="linenos">102</span></a><span class="sd">        int</span>
+</span><span id="L-103"><a href="#L-103"><span class="linenos">103</span></a><span class="sd">            0 if executed successfully.</span>
+</span><span id="L-104"><a href="#L-104"><span class="linenos">104</span></a>
+</span><span id="L-105"><a href="#L-105"><span class="linenos">105</span></a><span class="sd">        '''</span>
+</span><span id="L-106"><a href="#L-106"><span class="linenos">106</span></a>        <span class="n">command_string</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+</span><span id="L-107"><a href="#L-107"><span class="linenos">107</span></a>            <span class="s1">'/1'</span> <span class="o">+</span> <span class="n">command</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\r</span><span class="s1">'</span><span class="p">)</span>  <span class="c1"># add prefix and suffix and convert to bytes</span>
+</span><span id="L-108"><a href="#L-108"><span class="linenos">108</span></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'MUX write </span><span class="si">{</span><span class="n">command_string</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+</span><span id="L-109"><a href="#L-109"><span class="linenos">109</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">command_string</span><span class="p">)</span>
+</span><span id="L-110"><a href="#L-110"><span class="linenos">110</span></a>        <span class="n">reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serial_read</span><span class="p">()</span>  <span class="c1"># read reply from valve</span>
+</span><span id="L-111"><a href="#L-111"><span class="linenos">111</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_handle_reply</span><span class="p">(</span><span class="n">reply</span><span class="p">)</span>
+</span><span id="L-112"><a href="#L-112"><span class="linenos">112</span></a>        <span class="k">return</span> <span class="mi">0</span>
 </span><span id="L-113"><a href="#L-113"><span class="linenos">113</span></a>
-</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a><span class="sd">        Returns</span>
-</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="sd">        -------</span>
-</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="sd">        reply : str</span>
-</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a><span class="sd">            Reply from valve.</span>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>
-</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a><span class="sd">        '''</span>
-</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>        <span class="n">reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">inWaiting</span><span class="p">())</span>
-</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>        <span class="k">return</span> <span class="n">reply</span>
+</span><span id="L-114"><a href="#L-114"><span class="linenos">114</span></a>    <span class="k">def</span> <span class="nf">_serial_read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a><span class="w">        </span><span class="sd">'''</span>
+</span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a><span class="sd">        Reads replies from valve</span>
+</span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a><span class="sd">        Returns</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a><span class="sd">        -------</span>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a><span class="sd">        reply : str</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a><span class="sd">            Reply from valve.</span>
 </span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>
-</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>    <span class="k">def</span> <span class="nf">_handle_reply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reply</span><span class="p">):</span>
-</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a><span class="w">        </span><span class="sd">''' interprets reply from valve</span>
-</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a><span class="sd">            work in progress, currently just prints reply'''</span>
-</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'MUX has replied </span><span class="si">{</span><span class="n">reply</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>
-</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>    <span class="k">def</span> <span class="nf">home</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a><span class="w">        </span><span class="sd">'''</span>
-</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a><span class="sd">        Homes the valve</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a><span class="sd">        '''</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>        <span class="n">reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">inWaiting</span><span class="p">())</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>        <span class="k">return</span> <span class="n">reply</span>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>    <span class="k">def</span> <span class="nf">_handle_reply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reply</span><span class="p">):</span>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a><span class="w">        </span><span class="sd">''' interprets reply from valve</span>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a><span class="sd">            work in progress, currently just prints reply'''</span>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'MUX has replied </span><span class="si">{</span><span class="n">reply</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>
-</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a><span class="sd">        Returns</span>
-</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a><span class="sd">        -------</span>
-</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a><span class="sd">        int</span>
-</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a><span class="sd">            0 if executed successfully.</span>
-</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>
-</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a><span class="sd">        '''</span>
-</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'ZR'</span><span class="p">)</span>
-</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_valve_position</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># update valve position</span>
-</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>        <span class="k">return</span> <span class="mi">0</span>
-</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>
-</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>    <span class="k">def</span> <span class="nf">abort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a><span class="w">        </span><span class="sd">'''</span>
-</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a><span class="sd">        aborts movement (?)</span>
-</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a><span class="sd">        command is not properly documented in mnaual so might not be functional</span>
-</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>
-</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a><span class="sd">        Returns</span>
-</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a><span class="sd">        -------</span>
-</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a><span class="sd">        int</span>
-</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a><span class="sd">            0 if executed successfully.</span>
-</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>
-</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a><span class="sd">        '''</span>
-</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'T'</span><span class="p">)</span>
-</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>        <span class="k">return</span> <span class="mi">0</span>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a>    <span class="k">def</span> <span class="nf">home</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a><span class="w">        </span><span class="sd">'''</span>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a><span class="sd">        Homes the valve</span>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a><span class="sd">        Returns</span>
+</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a><span class="sd">        -------</span>
+</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a><span class="sd">        int</span>
+</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a><span class="sd">            0 if executed successfully.</span>
+</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>
+</span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a><span class="sd">        '''</span>
+</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'ZR'</span><span class="p">)</span>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_valve_position</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># update valve position</span>
+</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>        <span class="k">return</span> <span class="mi">0</span>
+</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>
+</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>    <span class="k">def</span> <span class="nf">abort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a><span class="w">        </span><span class="sd">'''</span>
+</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a><span class="sd">        aborts movement (?)</span>
+</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a><span class="sd">        command is not properly documented in mnaual so might not be functional</span>
+</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>
+</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a><span class="sd">        Returns</span>
+</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a><span class="sd">        -------</span>
+</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a><span class="sd">        int</span>
+</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a><span class="sd">            0 if executed successfully.</span>
 </span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a>
-</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a>    <span class="k">def</span> <span class="nf">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_channel</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a><span class="w">        </span><span class="sd">'''</span>
-</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a><span class="sd">        Move valve to channel if not already at desired position</span>
+</span><span id="L-156"><a href="#L-156"><span class="linenos">156</span></a><span class="sd">        '''</span>
+</span><span id="L-157"><a href="#L-157"><span class="linenos">157</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'T'</span><span class="p">)</span>
+</span><span id="L-158"><a href="#L-158"><span class="linenos">158</span></a>        <span class="k">return</span> <span class="mi">0</span>
 </span><span id="L-159"><a href="#L-159"><span class="linenos">159</span></a>
-</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a><span class="sd">        Parameters</span>
-</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a><span class="sd">        ----------</span>
-</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a><span class="sd">        channel : int</span>
-</span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a><span class="sd">            Desired channel position.</span>
-</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a><span class="sd">        </span>
-</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a><span class="sd">        direction : int, optional</span>
-</span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a><span class="sd">            0 - shortest path,  1 - incrememtal, 2 - decremental. The default is 0.</span>
-</span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a>
-</span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a><span class="sd">        Returns</span>
-</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a><span class="sd">        -------</span>
-</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a><span class="sd">        int</span>
-</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a><span class="sd">            New valve position. -1 if attempted to move valve beyond interval [1,2]</span>
-</span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a>
-</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a><span class="sd">        '''</span>
-</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a>        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_channel</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">13</span><span class="p">):</span>
-</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a>            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">'asked MUX to move to position </span><span class="si">{</span>
-</span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a><span class="w">                            </span><span class="n">new_channel</span><span class="si">}</span><span class="s1"> which does not exist'</span><span class="p">)</span>
-</span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a>            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
-</span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a>
-</span><span id="L-179"><a href="#L-179"><span class="linenos">179</span></a>        <span class="n">new_channel</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">new_channel</span><span class="p">))</span>
-</span><span id="L-180"><a href="#L-180"><span class="linenos">180</span></a>        <span class="n">direction</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">direction</span><span class="p">))</span>
-</span><span id="L-181"><a href="#L-181"><span class="linenos">181</span></a>
-</span><span id="L-182"><a href="#L-182"><span class="linenos">182</span></a>        <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'0'</span><span class="p">:</span>
-</span><span id="L-183"><a href="#L-183"><span class="linenos">183</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'b'</span> <span class="o">+</span> <span class="n">new_channel</span> <span class="o">+</span> <span class="s1">'R'</span><span class="p">)</span>
-</span><span id="L-184"><a href="#L-184"><span class="linenos">184</span></a>        <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'1'</span><span class="p">:</span>
-</span><span id="L-185"><a href="#L-185"><span class="linenos">185</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'i'</span> <span class="o">+</span> <span class="n">new_channel</span> <span class="o">+</span> <span class="s1">'R'</span><span class="p">)</span>
-</span><span id="L-186"><a href="#L-186"><span class="linenos">186</span></a>        <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'2'</span><span class="p">:</span>
-</span><span id="L-187"><a href="#L-187"><span class="linenos">187</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'o'</span> <span class="o">+</span> <span class="n">new_channel</span> <span class="o">+</span> <span class="s1">'R'</span><span class="p">)</span>
-</span><span id="L-188"><a href="#L-188"><span class="linenos">188</span></a>
-</span><span id="L-189"><a href="#L-189"><span class="linenos">189</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_valve_position</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
-</span><span id="L-190"><a href="#L-190"><span class="linenos">190</span></a>            <span class="n">new_channel</span><span class="p">)</span>  <span class="c1"># update valve position</span>
-</span><span id="L-191"><a href="#L-191"><span class="linenos">191</span></a>        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_channel</span><span class="p">)</span>
+</span><span id="L-160"><a href="#L-160"><span class="linenos">160</span></a>    <span class="k">def</span> <span class="nf">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_channel</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+</span><span id="L-161"><a href="#L-161"><span class="linenos">161</span></a><span class="w">        </span><span class="sd">'''</span>
+</span><span id="L-162"><a href="#L-162"><span class="linenos">162</span></a><span class="sd">        Move valve to channel if not already at desired position</span>
+</span><span id="L-163"><a href="#L-163"><span class="linenos">163</span></a>
+</span><span id="L-164"><a href="#L-164"><span class="linenos">164</span></a><span class="sd">        Parameters</span>
+</span><span id="L-165"><a href="#L-165"><span class="linenos">165</span></a><span class="sd">        ----------</span>
+</span><span id="L-166"><a href="#L-166"><span class="linenos">166</span></a><span class="sd">        channel : int</span>
+</span><span id="L-167"><a href="#L-167"><span class="linenos">167</span></a><span class="sd">            Desired channel position.</span>
+</span><span id="L-168"><a href="#L-168"><span class="linenos">168</span></a><span class="sd">        </span>
+</span><span id="L-169"><a href="#L-169"><span class="linenos">169</span></a><span class="sd">        direction : int, optional</span>
+</span><span id="L-170"><a href="#L-170"><span class="linenos">170</span></a><span class="sd">            0 - shortest path,  1 - incrememtal, 2 - decremental. The default is 0.</span>
+</span><span id="L-171"><a href="#L-171"><span class="linenos">171</span></a>
+</span><span id="L-172"><a href="#L-172"><span class="linenos">172</span></a><span class="sd">        Returns</span>
+</span><span id="L-173"><a href="#L-173"><span class="linenos">173</span></a><span class="sd">        -------</span>
+</span><span id="L-174"><a href="#L-174"><span class="linenos">174</span></a><span class="sd">        int</span>
+</span><span id="L-175"><a href="#L-175"><span class="linenos">175</span></a><span class="sd">            New valve position. -1 if attempted to move valve beyond number of available ports</span>
+</span><span id="L-176"><a href="#L-176"><span class="linenos">176</span></a>
+</span><span id="L-177"><a href="#L-177"><span class="linenos">177</span></a><span class="sd">        '''</span>
+</span><span id="L-178"><a href="#L-178"><span class="linenos">178</span></a>        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_channel</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_ports</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+</span><span id="L-179"><a href="#L-179"><span class="linenos">179</span></a>            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">'asked MUX to move to position </span><span class="si">{</span>
+</span><span id="L-180"><a href="#L-180"><span class="linenos">180</span></a><span class="w">                            </span><span class="n">new_channel</span><span class="si">}</span><span class="s1"> which does not exist'</span><span class="p">)</span>
+</span><span id="L-181"><a href="#L-181"><span class="linenos">181</span></a>            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+</span><span id="L-182"><a href="#L-182"><span class="linenos">182</span></a>
+</span><span id="L-183"><a href="#L-183"><span class="linenos">183</span></a>        <span class="n">new_channel</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">new_channel</span><span class="p">))</span>
+</span><span id="L-184"><a href="#L-184"><span class="linenos">184</span></a>        <span class="n">direction</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">direction</span><span class="p">))</span>
+</span><span id="L-185"><a href="#L-185"><span class="linenos">185</span></a>
+</span><span id="L-186"><a href="#L-186"><span class="linenos">186</span></a>        <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'0'</span><span class="p">:</span>
+</span><span id="L-187"><a href="#L-187"><span class="linenos">187</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'b'</span> <span class="o">+</span> <span class="n">new_channel</span> <span class="o">+</span> <span class="s1">'R'</span><span class="p">)</span>
+</span><span id="L-188"><a href="#L-188"><span class="linenos">188</span></a>        <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'1'</span><span class="p">:</span>
+</span><span id="L-189"><a href="#L-189"><span class="linenos">189</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'i'</span> <span class="o">+</span> <span class="n">new_channel</span> <span class="o">+</span> <span class="s1">'R'</span><span class="p">)</span>
+</span><span id="L-190"><a href="#L-190"><span class="linenos">190</span></a>        <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'2'</span><span class="p">:</span>
+</span><span id="L-191"><a href="#L-191"><span class="linenos">191</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'o'</span> <span class="o">+</span> <span class="n">new_channel</span> <span class="o">+</span> <span class="s1">'R'</span><span class="p">)</span>
 </span><span id="L-192"><a href="#L-192"><span class="linenos">192</span></a>
-</span><span id="L-193"><a href="#L-193"><span class="linenos">193</span></a>    <span class="k">def</span> <span class="nf">get_valve_postion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-194"><a href="#L-194"><span class="linenos">194</span></a><span class="w">        </span><span class="sd">'''</span>
-</span><span id="L-195"><a href="#L-195"><span class="linenos">195</span></a><span class="sd">        Reads the current valve position.</span>
-</span><span id="L-196"><a href="#L-196"><span class="linenos">196</span></a><span class="sd">        Work in progress, needs proper way to handle response, currently does nothing.</span>
-</span><span id="L-197"><a href="#L-197"><span class="linenos">197</span></a>
-</span><span id="L-198"><a href="#L-198"><span class="linenos">198</span></a><span class="sd">        Returns</span>
-</span><span id="L-199"><a href="#L-199"><span class="linenos">199</span></a><span class="sd">        -------</span>
-</span><span id="L-200"><a href="#L-200"><span class="linenos">200</span></a><span class="sd">        int</span>
-</span><span id="L-201"><a href="#L-201"><span class="linenos">201</span></a><span class="sd">            0 if executed successfully.</span>
-</span><span id="L-202"><a href="#L-202"><span class="linenos">202</span></a>
-</span><span id="L-203"><a href="#L-203"><span class="linenos">203</span></a><span class="sd">        '''</span>
-</span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'?6'</span><span class="p">)</span>
-</span><span id="L-205"><a href="#L-205"><span class="linenos">205</span></a>        <span class="k">return</span> <span class="mi">0</span>
+</span><span id="L-193"><a href="#L-193"><span class="linenos">193</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_valve_position</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+</span><span id="L-194"><a href="#L-194"><span class="linenos">194</span></a>            <span class="n">new_channel</span><span class="p">)</span>  <span class="c1"># update valve position</span>
+</span><span id="L-195"><a href="#L-195"><span class="linenos">195</span></a>        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_channel</span><span class="p">)</span>
+</span><span id="L-196"><a href="#L-196"><span class="linenos">196</span></a>
+</span><span id="L-197"><a href="#L-197"><span class="linenos">197</span></a>    <span class="k">def</span> <span class="nf">get_valve_postion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-198"><a href="#L-198"><span class="linenos">198</span></a><span class="w">        </span><span class="sd">'''</span>
+</span><span id="L-199"><a href="#L-199"><span class="linenos">199</span></a><span class="sd">        Reads the current valve position.</span>
+</span><span id="L-200"><a href="#L-200"><span class="linenos">200</span></a><span class="sd">        Work in progress, needs proper way to handle response, currently does nothing.</span>
+</span><span id="L-201"><a href="#L-201"><span class="linenos">201</span></a>
+</span><span id="L-202"><a href="#L-202"><span class="linenos">202</span></a><span class="sd">        Returns</span>
+</span><span id="L-203"><a href="#L-203"><span class="linenos">203</span></a><span class="sd">        -------</span>
+</span><span id="L-204"><a href="#L-204"><span class="linenos">204</span></a><span class="sd">        int</span>
+</span><span id="L-205"><a href="#L-205"><span class="linenos">205</span></a><span class="sd">            0 if executed successfully.</span>
+</span><span id="L-206"><a href="#L-206"><span class="linenos">206</span></a>
+</span><span id="L-207"><a href="#L-207"><span class="linenos">207</span></a><span class="sd">        '''</span>
+</span><span id="L-208"><a href="#L-208"><span class="linenos">208</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'?6'</span><span class="p">)</span>
+</span><span id="L-209"><a href="#L-209"><span class="linenos">209</span></a>        <span class="k">return</span> <span class="mi">0</span>
 </span></pre></div>
 
 
@@ -321,7 +328,7 @@ SOFTWARE.</p>
 </span><span id="rvm_valve-46"><a href="#rvm_valve-46"><span class="linenos"> 46</span></a><span class="w">    </span><span class="sd">'''</span>
 </span><span id="rvm_valve-47"><a href="#rvm_valve-47"><span class="linenos"> 47</span></a><span class="sd">    This driver controls OEM AVM rotary valves from Advanced Microfluidics.</span>
 </span><span id="rvm_valve-48"><a href="#rvm_valve-48"><span class="linenos"> 48</span></a><span class="sd">    '''</span>
-</span><span id="rvm_valve-49"><a href="#rvm_valve-49"><span class="linenos"> 49</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+</span><span id="rvm_valve-49"><a href="#rvm_valve-49"><span class="linenos"> 49</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">number_of_ports</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
 </span><span id="rvm_valve-50"><a href="#rvm_valve-50"><span class="linenos"> 50</span></a><span class="w">        </span><span class="sd">'''</span>
 </span><span id="rvm_valve-51"><a href="#rvm_valve-51"><span class="linenos"> 51</span></a><span class="sd">        Initialise valve control</span>
 </span><span id="rvm_valve-52"><a href="#rvm_valve-52"><span class="linenos"> 52</span></a>
@@ -329,156 +336,160 @@ SOFTWARE.</p>
 </span><span id="rvm_valve-54"><a href="#rvm_valve-54"><span class="linenos"> 54</span></a><span class="sd">        ----------</span>
 </span><span id="rvm_valve-55"><a href="#rvm_valve-55"><span class="linenos"> 55</span></a><span class="sd">        port : str</span>
 </span><span id="rvm_valve-56"><a href="#rvm_valve-56"><span class="linenos"> 56</span></a><span class="sd">            Port of valve, e.g. 'COM2' on Windows or device path of Linux / MacOS</span>
-</span><span id="rvm_valve-57"><a href="#rvm_valve-57"><span class="linenos"> 57</span></a>
-</span><span id="rvm_valve-58"><a href="#rvm_valve-58"><span class="linenos"> 58</span></a><span class="sd">        Returns</span>
-</span><span id="rvm_valve-59"><a href="#rvm_valve-59"><span class="linenos"> 59</span></a><span class="sd">        -------</span>
-</span><span id="rvm_valve-60"><a href="#rvm_valve-60"><span class="linenos"> 60</span></a><span class="sd">        None.</span>
-</span><span id="rvm_valve-61"><a href="#rvm_valve-61"><span class="linenos"> 61</span></a>
-</span><span id="rvm_valve-62"><a href="#rvm_valve-62"><span class="linenos"> 62</span></a><span class="sd">        '''</span>
-</span><span id="rvm_valve-63"><a href="#rvm_valve-63"><span class="linenos"> 63</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">valve</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="mi">9600</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
-</span><span id="rvm_valve-64"><a href="#rvm_valve-64"><span class="linenos"> 64</span></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'connected to RVM valve </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-</span><span id="rvm_valve-65"><a href="#rvm_valve-65"><span class="linenos"> 65</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_valve_position</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># keeps track of the valve position</span>
-</span><span id="rvm_valve-66"><a href="#rvm_valve-66"><span class="linenos"> 66</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">home</span><span class="p">()</span>
-</span><span id="rvm_valve-67"><a href="#rvm_valve-67"><span class="linenos"> 67</span></a>
-</span><span id="rvm_valve-68"><a href="#rvm_valve-68"><span class="linenos"> 68</span></a>    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="rvm_valve-69"><a href="#rvm_valve-69"><span class="linenos"> 69</span></a>        <span class="k">pass</span>
-</span><span id="rvm_valve-70"><a href="#rvm_valve-70"><span class="linenos"> 70</span></a>
-</span><span id="rvm_valve-71"><a href="#rvm_valve-71"><span class="linenos"> 71</span></a>    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="rvm_valve-72"><a href="#rvm_valve-72"><span class="linenos"> 72</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</span><span id="rvm_valve-73"><a href="#rvm_valve-73"><span class="linenos"> 73</span></a>
-</span><span id="rvm_valve-74"><a href="#rvm_valve-74"><span class="linenos"> 74</span></a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="rvm_valve-75"><a href="#rvm_valve-75"><span class="linenos"> 75</span></a><span class="w">        </span><span class="sd">'''</span>
-</span><span id="rvm_valve-76"><a href="#rvm_valve-76"><span class="linenos"> 76</span></a><span class="sd">        Closes connection to valve.</span>
+</span><span id="rvm_valve-57"><a href="#rvm_valve-57"><span class="linenos"> 57</span></a><span class="sd">            </span>
+</span><span id="rvm_valve-58"><a href="#rvm_valve-58"><span class="linenos"> 58</span></a><span class="sd">        number_of_ports : int, optional</span>
+</span><span id="rvm_valve-59"><a href="#rvm_valve-59"><span class="linenos"> 59</span></a><span class="sd">            Number of valve ports. The default is 12.</span>
+</span><span id="rvm_valve-60"><a href="#rvm_valve-60"><span class="linenos"> 60</span></a>
+</span><span id="rvm_valve-61"><a href="#rvm_valve-61"><span class="linenos"> 61</span></a><span class="sd">        Returns</span>
+</span><span id="rvm_valve-62"><a href="#rvm_valve-62"><span class="linenos"> 62</span></a><span class="sd">        -------</span>
+</span><span id="rvm_valve-63"><a href="#rvm_valve-63"><span class="linenos"> 63</span></a><span class="sd">        None.</span>
+</span><span id="rvm_valve-64"><a href="#rvm_valve-64"><span class="linenos"> 64</span></a>
+</span><span id="rvm_valve-65"><a href="#rvm_valve-65"><span class="linenos"> 65</span></a><span class="sd">        '''</span>
+</span><span id="rvm_valve-66"><a href="#rvm_valve-66"><span class="linenos"> 66</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">valve</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="mi">9600</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</span><span id="rvm_valve-67"><a href="#rvm_valve-67"><span class="linenos"> 67</span></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'connected to RVM valve </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+</span><span id="rvm_valve-68"><a href="#rvm_valve-68"><span class="linenos"> 68</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_ports</span> <span class="o">=</span> <span class="n">number_of_ports</span>
+</span><span id="rvm_valve-69"><a href="#rvm_valve-69"><span class="linenos"> 69</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_valve_position</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># keeps track of the valve position</span>
+</span><span id="rvm_valve-70"><a href="#rvm_valve-70"><span class="linenos"> 70</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">home</span><span class="p">()</span>
+</span><span id="rvm_valve-71"><a href="#rvm_valve-71"><span class="linenos"> 71</span></a>
+</span><span id="rvm_valve-72"><a href="#rvm_valve-72"><span class="linenos"> 72</span></a>    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="rvm_valve-73"><a href="#rvm_valve-73"><span class="linenos"> 73</span></a>        <span class="k">pass</span>
+</span><span id="rvm_valve-74"><a href="#rvm_valve-74"><span class="linenos"> 74</span></a>
+</span><span id="rvm_valve-75"><a href="#rvm_valve-75"><span class="linenos"> 75</span></a>    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="rvm_valve-76"><a href="#rvm_valve-76"><span class="linenos"> 76</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </span><span id="rvm_valve-77"><a href="#rvm_valve-77"><span class="linenos"> 77</span></a>
-</span><span id="rvm_valve-78"><a href="#rvm_valve-78"><span class="linenos"> 78</span></a><span class="sd">        Returns</span>
-</span><span id="rvm_valve-79"><a href="#rvm_valve-79"><span class="linenos"> 79</span></a><span class="sd">        -------</span>
-</span><span id="rvm_valve-80"><a href="#rvm_valve-80"><span class="linenos"> 80</span></a><span class="sd">        int</span>
-</span><span id="rvm_valve-81"><a href="#rvm_valve-81"><span class="linenos"> 81</span></a><span class="sd">            0 if executed successfully.</span>
-</span><span id="rvm_valve-82"><a href="#rvm_valve-82"><span class="linenos"> 82</span></a>
-</span><span id="rvm_valve-83"><a href="#rvm_valve-83"><span class="linenos"> 83</span></a><span class="sd">        '''</span>
-</span><span id="rvm_valve-84"><a href="#rvm_valve-84"><span class="linenos"> 84</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</span><span id="rvm_valve-85"><a href="#rvm_valve-85"><span class="linenos"> 85</span></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'MUX connection closed'</span><span class="p">)</span>
-</span><span id="rvm_valve-86"><a href="#rvm_valve-86"><span class="linenos"> 86</span></a>        <span class="k">return</span> <span class="mi">0</span>
-</span><span id="rvm_valve-87"><a href="#rvm_valve-87"><span class="linenos"> 87</span></a>
-</span><span id="rvm_valve-88"><a href="#rvm_valve-88"><span class="linenos"> 88</span></a>    <span class="k">def</span> <span class="nf">_execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
-</span><span id="rvm_valve-89"><a href="#rvm_valve-89"><span class="linenos"> 89</span></a><span class="w">        </span><span class="sd">'''</span>
-</span><span id="rvm_valve-90"><a href="#rvm_valve-90"><span class="linenos"> 90</span></a><span class="sd">        Send command to valve.</span>
+</span><span id="rvm_valve-78"><a href="#rvm_valve-78"><span class="linenos"> 78</span></a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="rvm_valve-79"><a href="#rvm_valve-79"><span class="linenos"> 79</span></a><span class="w">        </span><span class="sd">'''</span>
+</span><span id="rvm_valve-80"><a href="#rvm_valve-80"><span class="linenos"> 80</span></a><span class="sd">        Closes connection to valve.</span>
+</span><span id="rvm_valve-81"><a href="#rvm_valve-81"><span class="linenos"> 81</span></a>
+</span><span id="rvm_valve-82"><a href="#rvm_valve-82"><span class="linenos"> 82</span></a><span class="sd">        Returns</span>
+</span><span id="rvm_valve-83"><a href="#rvm_valve-83"><span class="linenos"> 83</span></a><span class="sd">        -------</span>
+</span><span id="rvm_valve-84"><a href="#rvm_valve-84"><span class="linenos"> 84</span></a><span class="sd">        int</span>
+</span><span id="rvm_valve-85"><a href="#rvm_valve-85"><span class="linenos"> 85</span></a><span class="sd">            0 if executed successfully.</span>
+</span><span id="rvm_valve-86"><a href="#rvm_valve-86"><span class="linenos"> 86</span></a>
+</span><span id="rvm_valve-87"><a href="#rvm_valve-87"><span class="linenos"> 87</span></a><span class="sd">        '''</span>
+</span><span id="rvm_valve-88"><a href="#rvm_valve-88"><span class="linenos"> 88</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span id="rvm_valve-89"><a href="#rvm_valve-89"><span class="linenos"> 89</span></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'MUX connection closed'</span><span class="p">)</span>
+</span><span id="rvm_valve-90"><a href="#rvm_valve-90"><span class="linenos"> 90</span></a>        <span class="k">return</span> <span class="mi">0</span>
 </span><span id="rvm_valve-91"><a href="#rvm_valve-91"><span class="linenos"> 91</span></a>
-</span><span id="rvm_valve-92"><a href="#rvm_valve-92"><span class="linenos"> 92</span></a><span class="sd">        Parameters</span>
-</span><span id="rvm_valve-93"><a href="#rvm_valve-93"><span class="linenos"> 93</span></a><span class="sd">        ----------</span>
-</span><span id="rvm_valve-94"><a href="#rvm_valve-94"><span class="linenos"> 94</span></a><span class="sd">        command : str</span>
-</span><span id="rvm_valve-95"><a href="#rvm_valve-95"><span class="linenos"> 95</span></a><span class="sd">            Command as outlined in manual.</span>
-</span><span id="rvm_valve-96"><a href="#rvm_valve-96"><span class="linenos"> 96</span></a>
-</span><span id="rvm_valve-97"><a href="#rvm_valve-97"><span class="linenos"> 97</span></a><span class="sd">        Returns</span>
-</span><span id="rvm_valve-98"><a href="#rvm_valve-98"><span class="linenos"> 98</span></a><span class="sd">        -------</span>
-</span><span id="rvm_valve-99"><a href="#rvm_valve-99"><span class="linenos"> 99</span></a><span class="sd">        int</span>
-</span><span id="rvm_valve-100"><a href="#rvm_valve-100"><span class="linenos">100</span></a><span class="sd">            0 if executed successfully.</span>
-</span><span id="rvm_valve-101"><a href="#rvm_valve-101"><span class="linenos">101</span></a>
-</span><span id="rvm_valve-102"><a href="#rvm_valve-102"><span class="linenos">102</span></a><span class="sd">        '''</span>
-</span><span id="rvm_valve-103"><a href="#rvm_valve-103"><span class="linenos">103</span></a>        <span class="n">command_string</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
-</span><span id="rvm_valve-104"><a href="#rvm_valve-104"><span class="linenos">104</span></a>            <span class="s1">'/1'</span> <span class="o">+</span> <span class="n">command</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\r</span><span class="s1">'</span><span class="p">)</span>  <span class="c1"># add prefix and suffix and convert to bytes</span>
-</span><span id="rvm_valve-105"><a href="#rvm_valve-105"><span class="linenos">105</span></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'MUX write </span><span class="si">{</span><span class="n">command_string</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-</span><span id="rvm_valve-106"><a href="#rvm_valve-106"><span class="linenos">106</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">command_string</span><span class="p">)</span>
-</span><span id="rvm_valve-107"><a href="#rvm_valve-107"><span class="linenos">107</span></a>        <span class="n">reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serial_read</span><span class="p">()</span>  <span class="c1"># read reply from valve</span>
-</span><span id="rvm_valve-108"><a href="#rvm_valve-108"><span class="linenos">108</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_handle_reply</span><span class="p">(</span><span class="n">reply</span><span class="p">)</span>
-</span><span id="rvm_valve-109"><a href="#rvm_valve-109"><span class="linenos">109</span></a>        <span class="k">return</span> <span class="mi">0</span>
-</span><span id="rvm_valve-110"><a href="#rvm_valve-110"><span class="linenos">110</span></a>
-</span><span id="rvm_valve-111"><a href="#rvm_valve-111"><span class="linenos">111</span></a>    <span class="k">def</span> <span class="nf">_serial_read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="rvm_valve-112"><a href="#rvm_valve-112"><span class="linenos">112</span></a><span class="w">        </span><span class="sd">'''</span>
-</span><span id="rvm_valve-113"><a href="#rvm_valve-113"><span class="linenos">113</span></a><span class="sd">        Reads replies from valve</span>
+</span><span id="rvm_valve-92"><a href="#rvm_valve-92"><span class="linenos"> 92</span></a>    <span class="k">def</span> <span class="nf">_execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
+</span><span id="rvm_valve-93"><a href="#rvm_valve-93"><span class="linenos"> 93</span></a><span class="w">        </span><span class="sd">'''</span>
+</span><span id="rvm_valve-94"><a href="#rvm_valve-94"><span class="linenos"> 94</span></a><span class="sd">        Send command to valve.</span>
+</span><span id="rvm_valve-95"><a href="#rvm_valve-95"><span class="linenos"> 95</span></a>
+</span><span id="rvm_valve-96"><a href="#rvm_valve-96"><span class="linenos"> 96</span></a><span class="sd">        Parameters</span>
+</span><span id="rvm_valve-97"><a href="#rvm_valve-97"><span class="linenos"> 97</span></a><span class="sd">        ----------</span>
+</span><span id="rvm_valve-98"><a href="#rvm_valve-98"><span class="linenos"> 98</span></a><span class="sd">        command : str</span>
+</span><span id="rvm_valve-99"><a href="#rvm_valve-99"><span class="linenos"> 99</span></a><span class="sd">            Command as outlined in manual.</span>
+</span><span id="rvm_valve-100"><a href="#rvm_valve-100"><span class="linenos">100</span></a>
+</span><span id="rvm_valve-101"><a href="#rvm_valve-101"><span class="linenos">101</span></a><span class="sd">        Returns</span>
+</span><span id="rvm_valve-102"><a href="#rvm_valve-102"><span class="linenos">102</span></a><span class="sd">        -------</span>
+</span><span id="rvm_valve-103"><a href="#rvm_valve-103"><span class="linenos">103</span></a><span class="sd">        int</span>
+</span><span id="rvm_valve-104"><a href="#rvm_valve-104"><span class="linenos">104</span></a><span class="sd">            0 if executed successfully.</span>
+</span><span id="rvm_valve-105"><a href="#rvm_valve-105"><span class="linenos">105</span></a>
+</span><span id="rvm_valve-106"><a href="#rvm_valve-106"><span class="linenos">106</span></a><span class="sd">        '''</span>
+</span><span id="rvm_valve-107"><a href="#rvm_valve-107"><span class="linenos">107</span></a>        <span class="n">command_string</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+</span><span id="rvm_valve-108"><a href="#rvm_valve-108"><span class="linenos">108</span></a>            <span class="s1">'/1'</span> <span class="o">+</span> <span class="n">command</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\r</span><span class="s1">'</span><span class="p">)</span>  <span class="c1"># add prefix and suffix and convert to bytes</span>
+</span><span id="rvm_valve-109"><a href="#rvm_valve-109"><span class="linenos">109</span></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'MUX write </span><span class="si">{</span><span class="n">command_string</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+</span><span id="rvm_valve-110"><a href="#rvm_valve-110"><span class="linenos">110</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">command_string</span><span class="p">)</span>
+</span><span id="rvm_valve-111"><a href="#rvm_valve-111"><span class="linenos">111</span></a>        <span class="n">reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serial_read</span><span class="p">()</span>  <span class="c1"># read reply from valve</span>
+</span><span id="rvm_valve-112"><a href="#rvm_valve-112"><span class="linenos">112</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_handle_reply</span><span class="p">(</span><span class="n">reply</span><span class="p">)</span>
+</span><span id="rvm_valve-113"><a href="#rvm_valve-113"><span class="linenos">113</span></a>        <span class="k">return</span> <span class="mi">0</span>
 </span><span id="rvm_valve-114"><a href="#rvm_valve-114"><span class="linenos">114</span></a>
-</span><span id="rvm_valve-115"><a href="#rvm_valve-115"><span class="linenos">115</span></a><span class="sd">        Returns</span>
-</span><span id="rvm_valve-116"><a href="#rvm_valve-116"><span class="linenos">116</span></a><span class="sd">        -------</span>
-</span><span id="rvm_valve-117"><a href="#rvm_valve-117"><span class="linenos">117</span></a><span class="sd">        reply : str</span>
-</span><span id="rvm_valve-118"><a href="#rvm_valve-118"><span class="linenos">118</span></a><span class="sd">            Reply from valve.</span>
-</span><span id="rvm_valve-119"><a href="#rvm_valve-119"><span class="linenos">119</span></a>
-</span><span id="rvm_valve-120"><a href="#rvm_valve-120"><span class="linenos">120</span></a><span class="sd">        '''</span>
-</span><span id="rvm_valve-121"><a href="#rvm_valve-121"><span class="linenos">121</span></a>        <span class="n">reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">inWaiting</span><span class="p">())</span>
-</span><span id="rvm_valve-122"><a href="#rvm_valve-122"><span class="linenos">122</span></a>        <span class="k">return</span> <span class="n">reply</span>
+</span><span id="rvm_valve-115"><a href="#rvm_valve-115"><span class="linenos">115</span></a>    <span class="k">def</span> <span class="nf">_serial_read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="rvm_valve-116"><a href="#rvm_valve-116"><span class="linenos">116</span></a><span class="w">        </span><span class="sd">'''</span>
+</span><span id="rvm_valve-117"><a href="#rvm_valve-117"><span class="linenos">117</span></a><span class="sd">        Reads replies from valve</span>
+</span><span id="rvm_valve-118"><a href="#rvm_valve-118"><span class="linenos">118</span></a>
+</span><span id="rvm_valve-119"><a href="#rvm_valve-119"><span class="linenos">119</span></a><span class="sd">        Returns</span>
+</span><span id="rvm_valve-120"><a href="#rvm_valve-120"><span class="linenos">120</span></a><span class="sd">        -------</span>
+</span><span id="rvm_valve-121"><a href="#rvm_valve-121"><span class="linenos">121</span></a><span class="sd">        reply : str</span>
+</span><span id="rvm_valve-122"><a href="#rvm_valve-122"><span class="linenos">122</span></a><span class="sd">            Reply from valve.</span>
 </span><span id="rvm_valve-123"><a href="#rvm_valve-123"><span class="linenos">123</span></a>
-</span><span id="rvm_valve-124"><a href="#rvm_valve-124"><span class="linenos">124</span></a>    <span class="k">def</span> <span class="nf">_handle_reply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reply</span><span class="p">):</span>
-</span><span id="rvm_valve-125"><a href="#rvm_valve-125"><span class="linenos">125</span></a><span class="w">        </span><span class="sd">''' interprets reply from valve</span>
-</span><span id="rvm_valve-126"><a href="#rvm_valve-126"><span class="linenos">126</span></a><span class="sd">            work in progress, currently just prints reply'''</span>
-</span><span id="rvm_valve-127"><a href="#rvm_valve-127"><span class="linenos">127</span></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'MUX has replied </span><span class="si">{</span><span class="n">reply</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-</span><span id="rvm_valve-128"><a href="#rvm_valve-128"><span class="linenos">128</span></a>
-</span><span id="rvm_valve-129"><a href="#rvm_valve-129"><span class="linenos">129</span></a>    <span class="k">def</span> <span class="nf">home</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="rvm_valve-130"><a href="#rvm_valve-130"><span class="linenos">130</span></a><span class="w">        </span><span class="sd">'''</span>
-</span><span id="rvm_valve-131"><a href="#rvm_valve-131"><span class="linenos">131</span></a><span class="sd">        Homes the valve</span>
+</span><span id="rvm_valve-124"><a href="#rvm_valve-124"><span class="linenos">124</span></a><span class="sd">        '''</span>
+</span><span id="rvm_valve-125"><a href="#rvm_valve-125"><span class="linenos">125</span></a>        <span class="n">reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">inWaiting</span><span class="p">())</span>
+</span><span id="rvm_valve-126"><a href="#rvm_valve-126"><span class="linenos">126</span></a>        <span class="k">return</span> <span class="n">reply</span>
+</span><span id="rvm_valve-127"><a href="#rvm_valve-127"><span class="linenos">127</span></a>
+</span><span id="rvm_valve-128"><a href="#rvm_valve-128"><span class="linenos">128</span></a>    <span class="k">def</span> <span class="nf">_handle_reply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reply</span><span class="p">):</span>
+</span><span id="rvm_valve-129"><a href="#rvm_valve-129"><span class="linenos">129</span></a><span class="w">        </span><span class="sd">''' interprets reply from valve</span>
+</span><span id="rvm_valve-130"><a href="#rvm_valve-130"><span class="linenos">130</span></a><span class="sd">            work in progress, currently just prints reply'''</span>
+</span><span id="rvm_valve-131"><a href="#rvm_valve-131"><span class="linenos">131</span></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'MUX has replied </span><span class="si">{</span><span class="n">reply</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 </span><span id="rvm_valve-132"><a href="#rvm_valve-132"><span class="linenos">132</span></a>
-</span><span id="rvm_valve-133"><a href="#rvm_valve-133"><span class="linenos">133</span></a><span class="sd">        Returns</span>
-</span><span id="rvm_valve-134"><a href="#rvm_valve-134"><span class="linenos">134</span></a><span class="sd">        -------</span>
-</span><span id="rvm_valve-135"><a href="#rvm_valve-135"><span class="linenos">135</span></a><span class="sd">        int</span>
-</span><span id="rvm_valve-136"><a href="#rvm_valve-136"><span class="linenos">136</span></a><span class="sd">            0 if executed successfully.</span>
-</span><span id="rvm_valve-137"><a href="#rvm_valve-137"><span class="linenos">137</span></a>
-</span><span id="rvm_valve-138"><a href="#rvm_valve-138"><span class="linenos">138</span></a><span class="sd">        '''</span>
-</span><span id="rvm_valve-139"><a href="#rvm_valve-139"><span class="linenos">139</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'ZR'</span><span class="p">)</span>
-</span><span id="rvm_valve-140"><a href="#rvm_valve-140"><span class="linenos">140</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_valve_position</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># update valve position</span>
-</span><span id="rvm_valve-141"><a href="#rvm_valve-141"><span class="linenos">141</span></a>        <span class="k">return</span> <span class="mi">0</span>
-</span><span id="rvm_valve-142"><a href="#rvm_valve-142"><span class="linenos">142</span></a>
-</span><span id="rvm_valve-143"><a href="#rvm_valve-143"><span class="linenos">143</span></a>    <span class="k">def</span> <span class="nf">abort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="rvm_valve-144"><a href="#rvm_valve-144"><span class="linenos">144</span></a><span class="w">        </span><span class="sd">'''</span>
-</span><span id="rvm_valve-145"><a href="#rvm_valve-145"><span class="linenos">145</span></a><span class="sd">        aborts movement (?)</span>
-</span><span id="rvm_valve-146"><a href="#rvm_valve-146"><span class="linenos">146</span></a><span class="sd">        command is not properly documented in mnaual so might not be functional</span>
-</span><span id="rvm_valve-147"><a href="#rvm_valve-147"><span class="linenos">147</span></a>
-</span><span id="rvm_valve-148"><a href="#rvm_valve-148"><span class="linenos">148</span></a><span class="sd">        Returns</span>
-</span><span id="rvm_valve-149"><a href="#rvm_valve-149"><span class="linenos">149</span></a><span class="sd">        -------</span>
-</span><span id="rvm_valve-150"><a href="#rvm_valve-150"><span class="linenos">150</span></a><span class="sd">        int</span>
-</span><span id="rvm_valve-151"><a href="#rvm_valve-151"><span class="linenos">151</span></a><span class="sd">            0 if executed successfully.</span>
-</span><span id="rvm_valve-152"><a href="#rvm_valve-152"><span class="linenos">152</span></a>
-</span><span id="rvm_valve-153"><a href="#rvm_valve-153"><span class="linenos">153</span></a><span class="sd">        '''</span>
-</span><span id="rvm_valve-154"><a href="#rvm_valve-154"><span class="linenos">154</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'T'</span><span class="p">)</span>
-</span><span id="rvm_valve-155"><a href="#rvm_valve-155"><span class="linenos">155</span></a>        <span class="k">return</span> <span class="mi">0</span>
+</span><span id="rvm_valve-133"><a href="#rvm_valve-133"><span class="linenos">133</span></a>    <span class="k">def</span> <span class="nf">home</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="rvm_valve-134"><a href="#rvm_valve-134"><span class="linenos">134</span></a><span class="w">        </span><span class="sd">'''</span>
+</span><span id="rvm_valve-135"><a href="#rvm_valve-135"><span class="linenos">135</span></a><span class="sd">        Homes the valve</span>
+</span><span id="rvm_valve-136"><a href="#rvm_valve-136"><span class="linenos">136</span></a>
+</span><span id="rvm_valve-137"><a href="#rvm_valve-137"><span class="linenos">137</span></a><span class="sd">        Returns</span>
+</span><span id="rvm_valve-138"><a href="#rvm_valve-138"><span class="linenos">138</span></a><span class="sd">        -------</span>
+</span><span id="rvm_valve-139"><a href="#rvm_valve-139"><span class="linenos">139</span></a><span class="sd">        int</span>
+</span><span id="rvm_valve-140"><a href="#rvm_valve-140"><span class="linenos">140</span></a><span class="sd">            0 if executed successfully.</span>
+</span><span id="rvm_valve-141"><a href="#rvm_valve-141"><span class="linenos">141</span></a>
+</span><span id="rvm_valve-142"><a href="#rvm_valve-142"><span class="linenos">142</span></a><span class="sd">        '''</span>
+</span><span id="rvm_valve-143"><a href="#rvm_valve-143"><span class="linenos">143</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'ZR'</span><span class="p">)</span>
+</span><span id="rvm_valve-144"><a href="#rvm_valve-144"><span class="linenos">144</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_valve_position</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># update valve position</span>
+</span><span id="rvm_valve-145"><a href="#rvm_valve-145"><span class="linenos">145</span></a>        <span class="k">return</span> <span class="mi">0</span>
+</span><span id="rvm_valve-146"><a href="#rvm_valve-146"><span class="linenos">146</span></a>
+</span><span id="rvm_valve-147"><a href="#rvm_valve-147"><span class="linenos">147</span></a>    <span class="k">def</span> <span class="nf">abort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="rvm_valve-148"><a href="#rvm_valve-148"><span class="linenos">148</span></a><span class="w">        </span><span class="sd">'''</span>
+</span><span id="rvm_valve-149"><a href="#rvm_valve-149"><span class="linenos">149</span></a><span class="sd">        aborts movement (?)</span>
+</span><span id="rvm_valve-150"><a href="#rvm_valve-150"><span class="linenos">150</span></a><span class="sd">        command is not properly documented in mnaual so might not be functional</span>
+</span><span id="rvm_valve-151"><a href="#rvm_valve-151"><span class="linenos">151</span></a>
+</span><span id="rvm_valve-152"><a href="#rvm_valve-152"><span class="linenos">152</span></a><span class="sd">        Returns</span>
+</span><span id="rvm_valve-153"><a href="#rvm_valve-153"><span class="linenos">153</span></a><span class="sd">        -------</span>
+</span><span id="rvm_valve-154"><a href="#rvm_valve-154"><span class="linenos">154</span></a><span class="sd">        int</span>
+</span><span id="rvm_valve-155"><a href="#rvm_valve-155"><span class="linenos">155</span></a><span class="sd">            0 if executed successfully.</span>
 </span><span id="rvm_valve-156"><a href="#rvm_valve-156"><span class="linenos">156</span></a>
-</span><span id="rvm_valve-157"><a href="#rvm_valve-157"><span class="linenos">157</span></a>    <span class="k">def</span> <span class="nf">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_channel</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-</span><span id="rvm_valve-158"><a href="#rvm_valve-158"><span class="linenos">158</span></a><span class="w">        </span><span class="sd">'''</span>
-</span><span id="rvm_valve-159"><a href="#rvm_valve-159"><span class="linenos">159</span></a><span class="sd">        Move valve to channel if not already at desired position</span>
+</span><span id="rvm_valve-157"><a href="#rvm_valve-157"><span class="linenos">157</span></a><span class="sd">        '''</span>
+</span><span id="rvm_valve-158"><a href="#rvm_valve-158"><span class="linenos">158</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'T'</span><span class="p">)</span>
+</span><span id="rvm_valve-159"><a href="#rvm_valve-159"><span class="linenos">159</span></a>        <span class="k">return</span> <span class="mi">0</span>
 </span><span id="rvm_valve-160"><a href="#rvm_valve-160"><span class="linenos">160</span></a>
-</span><span id="rvm_valve-161"><a href="#rvm_valve-161"><span class="linenos">161</span></a><span class="sd">        Parameters</span>
-</span><span id="rvm_valve-162"><a href="#rvm_valve-162"><span class="linenos">162</span></a><span class="sd">        ----------</span>
-</span><span id="rvm_valve-163"><a href="#rvm_valve-163"><span class="linenos">163</span></a><span class="sd">        channel : int</span>
-</span><span id="rvm_valve-164"><a href="#rvm_valve-164"><span class="linenos">164</span></a><span class="sd">            Desired channel position.</span>
-</span><span id="rvm_valve-165"><a href="#rvm_valve-165"><span class="linenos">165</span></a><span class="sd">        </span>
-</span><span id="rvm_valve-166"><a href="#rvm_valve-166"><span class="linenos">166</span></a><span class="sd">        direction : int, optional</span>
-</span><span id="rvm_valve-167"><a href="#rvm_valve-167"><span class="linenos">167</span></a><span class="sd">            0 - shortest path,  1 - incrememtal, 2 - decremental. The default is 0.</span>
-</span><span id="rvm_valve-168"><a href="#rvm_valve-168"><span class="linenos">168</span></a>
-</span><span id="rvm_valve-169"><a href="#rvm_valve-169"><span class="linenos">169</span></a><span class="sd">        Returns</span>
-</span><span id="rvm_valve-170"><a href="#rvm_valve-170"><span class="linenos">170</span></a><span class="sd">        -------</span>
-</span><span id="rvm_valve-171"><a href="#rvm_valve-171"><span class="linenos">171</span></a><span class="sd">        int</span>
-</span><span id="rvm_valve-172"><a href="#rvm_valve-172"><span class="linenos">172</span></a><span class="sd">            New valve position. -1 if attempted to move valve beyond interval [1,2]</span>
-</span><span id="rvm_valve-173"><a href="#rvm_valve-173"><span class="linenos">173</span></a>
-</span><span id="rvm_valve-174"><a href="#rvm_valve-174"><span class="linenos">174</span></a><span class="sd">        '''</span>
-</span><span id="rvm_valve-175"><a href="#rvm_valve-175"><span class="linenos">175</span></a>        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_channel</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">13</span><span class="p">):</span>
-</span><span id="rvm_valve-176"><a href="#rvm_valve-176"><span class="linenos">176</span></a>            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">'asked MUX to move to position </span><span class="si">{</span>
-</span><span id="rvm_valve-177"><a href="#rvm_valve-177"><span class="linenos">177</span></a><span class="w">                            </span><span class="n">new_channel</span><span class="si">}</span><span class="s1"> which does not exist'</span><span class="p">)</span>
-</span><span id="rvm_valve-178"><a href="#rvm_valve-178"><span class="linenos">178</span></a>            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
-</span><span id="rvm_valve-179"><a href="#rvm_valve-179"><span class="linenos">179</span></a>
-</span><span id="rvm_valve-180"><a href="#rvm_valve-180"><span class="linenos">180</span></a>        <span class="n">new_channel</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">new_channel</span><span class="p">))</span>
-</span><span id="rvm_valve-181"><a href="#rvm_valve-181"><span class="linenos">181</span></a>        <span class="n">direction</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">direction</span><span class="p">))</span>
-</span><span id="rvm_valve-182"><a href="#rvm_valve-182"><span class="linenos">182</span></a>
-</span><span id="rvm_valve-183"><a href="#rvm_valve-183"><span class="linenos">183</span></a>        <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'0'</span><span class="p">:</span>
-</span><span id="rvm_valve-184"><a href="#rvm_valve-184"><span class="linenos">184</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'b'</span> <span class="o">+</span> <span class="n">new_channel</span> <span class="o">+</span> <span class="s1">'R'</span><span class="p">)</span>
-</span><span id="rvm_valve-185"><a href="#rvm_valve-185"><span class="linenos">185</span></a>        <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'1'</span><span class="p">:</span>
-</span><span id="rvm_valve-186"><a href="#rvm_valve-186"><span class="linenos">186</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'i'</span> <span class="o">+</span> <span class="n">new_channel</span> <span class="o">+</span> <span class="s1">'R'</span><span class="p">)</span>
-</span><span id="rvm_valve-187"><a href="#rvm_valve-187"><span class="linenos">187</span></a>        <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'2'</span><span class="p">:</span>
-</span><span id="rvm_valve-188"><a href="#rvm_valve-188"><span class="linenos">188</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'o'</span> <span class="o">+</span> <span class="n">new_channel</span> <span class="o">+</span> <span class="s1">'R'</span><span class="p">)</span>
-</span><span id="rvm_valve-189"><a href="#rvm_valve-189"><span class="linenos">189</span></a>
-</span><span id="rvm_valve-190"><a href="#rvm_valve-190"><span class="linenos">190</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_valve_position</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
-</span><span id="rvm_valve-191"><a href="#rvm_valve-191"><span class="linenos">191</span></a>            <span class="n">new_channel</span><span class="p">)</span>  <span class="c1"># update valve position</span>
-</span><span id="rvm_valve-192"><a href="#rvm_valve-192"><span class="linenos">192</span></a>        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_channel</span><span class="p">)</span>
+</span><span id="rvm_valve-161"><a href="#rvm_valve-161"><span class="linenos">161</span></a>    <span class="k">def</span> <span class="nf">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_channel</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+</span><span id="rvm_valve-162"><a href="#rvm_valve-162"><span class="linenos">162</span></a><span class="w">        </span><span class="sd">'''</span>
+</span><span id="rvm_valve-163"><a href="#rvm_valve-163"><span class="linenos">163</span></a><span class="sd">        Move valve to channel if not already at desired position</span>
+</span><span id="rvm_valve-164"><a href="#rvm_valve-164"><span class="linenos">164</span></a>
+</span><span id="rvm_valve-165"><a href="#rvm_valve-165"><span class="linenos">165</span></a><span class="sd">        Parameters</span>
+</span><span id="rvm_valve-166"><a href="#rvm_valve-166"><span class="linenos">166</span></a><span class="sd">        ----------</span>
+</span><span id="rvm_valve-167"><a href="#rvm_valve-167"><span class="linenos">167</span></a><span class="sd">        channel : int</span>
+</span><span id="rvm_valve-168"><a href="#rvm_valve-168"><span class="linenos">168</span></a><span class="sd">            Desired channel position.</span>
+</span><span id="rvm_valve-169"><a href="#rvm_valve-169"><span class="linenos">169</span></a><span class="sd">        </span>
+</span><span id="rvm_valve-170"><a href="#rvm_valve-170"><span class="linenos">170</span></a><span class="sd">        direction : int, optional</span>
+</span><span id="rvm_valve-171"><a href="#rvm_valve-171"><span class="linenos">171</span></a><span class="sd">            0 - shortest path,  1 - incrememtal, 2 - decremental. The default is 0.</span>
+</span><span id="rvm_valve-172"><a href="#rvm_valve-172"><span class="linenos">172</span></a>
+</span><span id="rvm_valve-173"><a href="#rvm_valve-173"><span class="linenos">173</span></a><span class="sd">        Returns</span>
+</span><span id="rvm_valve-174"><a href="#rvm_valve-174"><span class="linenos">174</span></a><span class="sd">        -------</span>
+</span><span id="rvm_valve-175"><a href="#rvm_valve-175"><span class="linenos">175</span></a><span class="sd">        int</span>
+</span><span id="rvm_valve-176"><a href="#rvm_valve-176"><span class="linenos">176</span></a><span class="sd">            New valve position. -1 if attempted to move valve beyond number of available ports</span>
+</span><span id="rvm_valve-177"><a href="#rvm_valve-177"><span class="linenos">177</span></a>
+</span><span id="rvm_valve-178"><a href="#rvm_valve-178"><span class="linenos">178</span></a><span class="sd">        '''</span>
+</span><span id="rvm_valve-179"><a href="#rvm_valve-179"><span class="linenos">179</span></a>        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_channel</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_ports</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+</span><span id="rvm_valve-180"><a href="#rvm_valve-180"><span class="linenos">180</span></a>            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">'asked MUX to move to position </span><span class="si">{</span>
+</span><span id="rvm_valve-181"><a href="#rvm_valve-181"><span class="linenos">181</span></a><span class="w">                            </span><span class="n">new_channel</span><span class="si">}</span><span class="s1"> which does not exist'</span><span class="p">)</span>
+</span><span id="rvm_valve-182"><a href="#rvm_valve-182"><span class="linenos">182</span></a>            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+</span><span id="rvm_valve-183"><a href="#rvm_valve-183"><span class="linenos">183</span></a>
+</span><span id="rvm_valve-184"><a href="#rvm_valve-184"><span class="linenos">184</span></a>        <span class="n">new_channel</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">new_channel</span><span class="p">))</span>
+</span><span id="rvm_valve-185"><a href="#rvm_valve-185"><span class="linenos">185</span></a>        <span class="n">direction</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">direction</span><span class="p">))</span>
+</span><span id="rvm_valve-186"><a href="#rvm_valve-186"><span class="linenos">186</span></a>
+</span><span id="rvm_valve-187"><a href="#rvm_valve-187"><span class="linenos">187</span></a>        <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'0'</span><span class="p">:</span>
+</span><span id="rvm_valve-188"><a href="#rvm_valve-188"><span class="linenos">188</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'b'</span> <span class="o">+</span> <span class="n">new_channel</span> <span class="o">+</span> <span class="s1">'R'</span><span class="p">)</span>
+</span><span id="rvm_valve-189"><a href="#rvm_valve-189"><span class="linenos">189</span></a>        <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'1'</span><span class="p">:</span>
+</span><span id="rvm_valve-190"><a href="#rvm_valve-190"><span class="linenos">190</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'i'</span> <span class="o">+</span> <span class="n">new_channel</span> <span class="o">+</span> <span class="s1">'R'</span><span class="p">)</span>
+</span><span id="rvm_valve-191"><a href="#rvm_valve-191"><span class="linenos">191</span></a>        <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'2'</span><span class="p">:</span>
+</span><span id="rvm_valve-192"><a href="#rvm_valve-192"><span class="linenos">192</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'o'</span> <span class="o">+</span> <span class="n">new_channel</span> <span class="o">+</span> <span class="s1">'R'</span><span class="p">)</span>
 </span><span id="rvm_valve-193"><a href="#rvm_valve-193"><span class="linenos">193</span></a>
-</span><span id="rvm_valve-194"><a href="#rvm_valve-194"><span class="linenos">194</span></a>    <span class="k">def</span> <span class="nf">get_valve_postion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="rvm_valve-195"><a href="#rvm_valve-195"><span class="linenos">195</span></a><span class="w">        </span><span class="sd">'''</span>
-</span><span id="rvm_valve-196"><a href="#rvm_valve-196"><span class="linenos">196</span></a><span class="sd">        Reads the current valve position.</span>
-</span><span id="rvm_valve-197"><a href="#rvm_valve-197"><span class="linenos">197</span></a><span class="sd">        Work in progress, needs proper way to handle response, currently does nothing.</span>
-</span><span id="rvm_valve-198"><a href="#rvm_valve-198"><span class="linenos">198</span></a>
-</span><span id="rvm_valve-199"><a href="#rvm_valve-199"><span class="linenos">199</span></a><span class="sd">        Returns</span>
-</span><span id="rvm_valve-200"><a href="#rvm_valve-200"><span class="linenos">200</span></a><span class="sd">        -------</span>
-</span><span id="rvm_valve-201"><a href="#rvm_valve-201"><span class="linenos">201</span></a><span class="sd">        int</span>
-</span><span id="rvm_valve-202"><a href="#rvm_valve-202"><span class="linenos">202</span></a><span class="sd">            0 if executed successfully.</span>
-</span><span id="rvm_valve-203"><a href="#rvm_valve-203"><span class="linenos">203</span></a>
-</span><span id="rvm_valve-204"><a href="#rvm_valve-204"><span class="linenos">204</span></a><span class="sd">        '''</span>
-</span><span id="rvm_valve-205"><a href="#rvm_valve-205"><span class="linenos">205</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'?6'</span><span class="p">)</span>
-</span><span id="rvm_valve-206"><a href="#rvm_valve-206"><span class="linenos">206</span></a>        <span class="k">return</span> <span class="mi">0</span>
+</span><span id="rvm_valve-194"><a href="#rvm_valve-194"><span class="linenos">194</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_valve_position</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+</span><span id="rvm_valve-195"><a href="#rvm_valve-195"><span class="linenos">195</span></a>            <span class="n">new_channel</span><span class="p">)</span>  <span class="c1"># update valve position</span>
+</span><span id="rvm_valve-196"><a href="#rvm_valve-196"><span class="linenos">196</span></a>        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_channel</span><span class="p">)</span>
+</span><span id="rvm_valve-197"><a href="#rvm_valve-197"><span class="linenos">197</span></a>
+</span><span id="rvm_valve-198"><a href="#rvm_valve-198"><span class="linenos">198</span></a>    <span class="k">def</span> <span class="nf">get_valve_postion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="rvm_valve-199"><a href="#rvm_valve-199"><span class="linenos">199</span></a><span class="w">        </span><span class="sd">'''</span>
+</span><span id="rvm_valve-200"><a href="#rvm_valve-200"><span class="linenos">200</span></a><span class="sd">        Reads the current valve position.</span>
+</span><span id="rvm_valve-201"><a href="#rvm_valve-201"><span class="linenos">201</span></a><span class="sd">        Work in progress, needs proper way to handle response, currently does nothing.</span>
+</span><span id="rvm_valve-202"><a href="#rvm_valve-202"><span class="linenos">202</span></a>
+</span><span id="rvm_valve-203"><a href="#rvm_valve-203"><span class="linenos">203</span></a><span class="sd">        Returns</span>
+</span><span id="rvm_valve-204"><a href="#rvm_valve-204"><span class="linenos">204</span></a><span class="sd">        -------</span>
+</span><span id="rvm_valve-205"><a href="#rvm_valve-205"><span class="linenos">205</span></a><span class="sd">        int</span>
+</span><span id="rvm_valve-206"><a href="#rvm_valve-206"><span class="linenos">206</span></a><span class="sd">            0 if executed successfully.</span>
+</span><span id="rvm_valve-207"><a href="#rvm_valve-207"><span class="linenos">207</span></a>
+</span><span id="rvm_valve-208"><a href="#rvm_valve-208"><span class="linenos">208</span></a><span class="sd">        '''</span>
+</span><span id="rvm_valve-209"><a href="#rvm_valve-209"><span class="linenos">209</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'?6'</span><span class="p">)</span>
+</span><span id="rvm_valve-210"><a href="#rvm_valve-210"><span class="linenos">210</span></a>        <span class="k">return</span> <span class="mi">0</span>
 </span></pre></div>
 
 
@@ -490,13 +501,13 @@ SOFTWARE.</p>
                                         <input id="rvm_valve.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">rvm_valve</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">port</span></span>)</span>
+        <span class="name">rvm_valve</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">port</span>, </span><span class="param"><span class="n">number_of_ports</span><span class="o">=</span><span class="mi">12</span></span>)</span>
 
                 <label class="view-source-button" for="rvm_valve.__init__-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#rvm_valve.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="rvm_valve.__init__-49"><a href="#rvm_valve.__init__-49"><span class="linenos">49</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="rvm_valve.__init__-49"><a href="#rvm_valve.__init__-49"><span class="linenos">49</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">number_of_ports</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
 </span><span id="rvm_valve.__init__-50"><a href="#rvm_valve.__init__-50"><span class="linenos">50</span></a><span class="w">        </span><span class="sd">'''</span>
 </span><span id="rvm_valve.__init__-51"><a href="#rvm_valve.__init__-51"><span class="linenos">51</span></a><span class="sd">        Initialise valve control</span>
 </span><span id="rvm_valve.__init__-52"><a href="#rvm_valve.__init__-52"><span class="linenos">52</span></a>
@@ -504,16 +515,20 @@ SOFTWARE.</p>
 </span><span id="rvm_valve.__init__-54"><a href="#rvm_valve.__init__-54"><span class="linenos">54</span></a><span class="sd">        ----------</span>
 </span><span id="rvm_valve.__init__-55"><a href="#rvm_valve.__init__-55"><span class="linenos">55</span></a><span class="sd">        port : str</span>
 </span><span id="rvm_valve.__init__-56"><a href="#rvm_valve.__init__-56"><span class="linenos">56</span></a><span class="sd">            Port of valve, e.g. 'COM2' on Windows or device path of Linux / MacOS</span>
-</span><span id="rvm_valve.__init__-57"><a href="#rvm_valve.__init__-57"><span class="linenos">57</span></a>
-</span><span id="rvm_valve.__init__-58"><a href="#rvm_valve.__init__-58"><span class="linenos">58</span></a><span class="sd">        Returns</span>
-</span><span id="rvm_valve.__init__-59"><a href="#rvm_valve.__init__-59"><span class="linenos">59</span></a><span class="sd">        -------</span>
-</span><span id="rvm_valve.__init__-60"><a href="#rvm_valve.__init__-60"><span class="linenos">60</span></a><span class="sd">        None.</span>
-</span><span id="rvm_valve.__init__-61"><a href="#rvm_valve.__init__-61"><span class="linenos">61</span></a>
-</span><span id="rvm_valve.__init__-62"><a href="#rvm_valve.__init__-62"><span class="linenos">62</span></a><span class="sd">        '''</span>
-</span><span id="rvm_valve.__init__-63"><a href="#rvm_valve.__init__-63"><span class="linenos">63</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">valve</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="mi">9600</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
-</span><span id="rvm_valve.__init__-64"><a href="#rvm_valve.__init__-64"><span class="linenos">64</span></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'connected to RVM valve </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
-</span><span id="rvm_valve.__init__-65"><a href="#rvm_valve.__init__-65"><span class="linenos">65</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_valve_position</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># keeps track of the valve position</span>
-</span><span id="rvm_valve.__init__-66"><a href="#rvm_valve.__init__-66"><span class="linenos">66</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">home</span><span class="p">()</span>
+</span><span id="rvm_valve.__init__-57"><a href="#rvm_valve.__init__-57"><span class="linenos">57</span></a><span class="sd">            </span>
+</span><span id="rvm_valve.__init__-58"><a href="#rvm_valve.__init__-58"><span class="linenos">58</span></a><span class="sd">        number_of_ports : int, optional</span>
+</span><span id="rvm_valve.__init__-59"><a href="#rvm_valve.__init__-59"><span class="linenos">59</span></a><span class="sd">            Number of valve ports. The default is 12.</span>
+</span><span id="rvm_valve.__init__-60"><a href="#rvm_valve.__init__-60"><span class="linenos">60</span></a>
+</span><span id="rvm_valve.__init__-61"><a href="#rvm_valve.__init__-61"><span class="linenos">61</span></a><span class="sd">        Returns</span>
+</span><span id="rvm_valve.__init__-62"><a href="#rvm_valve.__init__-62"><span class="linenos">62</span></a><span class="sd">        -------</span>
+</span><span id="rvm_valve.__init__-63"><a href="#rvm_valve.__init__-63"><span class="linenos">63</span></a><span class="sd">        None.</span>
+</span><span id="rvm_valve.__init__-64"><a href="#rvm_valve.__init__-64"><span class="linenos">64</span></a>
+</span><span id="rvm_valve.__init__-65"><a href="#rvm_valve.__init__-65"><span class="linenos">65</span></a><span class="sd">        '''</span>
+</span><span id="rvm_valve.__init__-66"><a href="#rvm_valve.__init__-66"><span class="linenos">66</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">valve</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="mi">9600</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</span><span id="rvm_valve.__init__-67"><a href="#rvm_valve.__init__-67"><span class="linenos">67</span></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'connected to RVM valve </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+</span><span id="rvm_valve.__init__-68"><a href="#rvm_valve.__init__-68"><span class="linenos">68</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_ports</span> <span class="o">=</span> <span class="n">number_of_ports</span>
+</span><span id="rvm_valve.__init__-69"><a href="#rvm_valve.__init__-69"><span class="linenos">69</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_valve_position</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># keeps track of the valve position</span>
+</span><span id="rvm_valve.__init__-70"><a href="#rvm_valve.__init__-70"><span class="linenos">70</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">home</span><span class="p">()</span>
 </span></pre></div>
 
 
@@ -523,6 +538,9 @@ SOFTWARE.</p>
 
 <p>port : str
     Port of valve, e.g. 'COM2' on Windows or device path of Linux / MacOS</p>
+
+<p>number_of_ports : int, optional
+    Number of valve ports. The default is 12.</p>
 
 <h2 id="returns">Returns</h2>
 
@@ -538,6 +556,17 @@ SOFTWARE.</p>
         
     </div>
     <a class="headerlink" href="#rvm_valve.valve"></a>
+    
+    
+
+                            </div>
+                            <div id="rvm_valve.number_of_ports" class="classattr">
+                                <div class="attr variable">
+            <span class="name">number_of_ports</span>
+
+        
+    </div>
+    <a class="headerlink" href="#rvm_valve.number_of_ports"></a>
     
     
 
@@ -564,19 +593,19 @@ SOFTWARE.</p>
 
     </div>
     <a class="headerlink" href="#rvm_valve.close"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="rvm_valve.close-74"><a href="#rvm_valve.close-74"><span class="linenos">74</span></a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="rvm_valve.close-75"><a href="#rvm_valve.close-75"><span class="linenos">75</span></a><span class="w">        </span><span class="sd">'''</span>
-</span><span id="rvm_valve.close-76"><a href="#rvm_valve.close-76"><span class="linenos">76</span></a><span class="sd">        Closes connection to valve.</span>
-</span><span id="rvm_valve.close-77"><a href="#rvm_valve.close-77"><span class="linenos">77</span></a>
-</span><span id="rvm_valve.close-78"><a href="#rvm_valve.close-78"><span class="linenos">78</span></a><span class="sd">        Returns</span>
-</span><span id="rvm_valve.close-79"><a href="#rvm_valve.close-79"><span class="linenos">79</span></a><span class="sd">        -------</span>
-</span><span id="rvm_valve.close-80"><a href="#rvm_valve.close-80"><span class="linenos">80</span></a><span class="sd">        int</span>
-</span><span id="rvm_valve.close-81"><a href="#rvm_valve.close-81"><span class="linenos">81</span></a><span class="sd">            0 if executed successfully.</span>
-</span><span id="rvm_valve.close-82"><a href="#rvm_valve.close-82"><span class="linenos">82</span></a>
-</span><span id="rvm_valve.close-83"><a href="#rvm_valve.close-83"><span class="linenos">83</span></a><span class="sd">        '''</span>
-</span><span id="rvm_valve.close-84"><a href="#rvm_valve.close-84"><span class="linenos">84</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</span><span id="rvm_valve.close-85"><a href="#rvm_valve.close-85"><span class="linenos">85</span></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'MUX connection closed'</span><span class="p">)</span>
-</span><span id="rvm_valve.close-86"><a href="#rvm_valve.close-86"><span class="linenos">86</span></a>        <span class="k">return</span> <span class="mi">0</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="rvm_valve.close-78"><a href="#rvm_valve.close-78"><span class="linenos">78</span></a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="rvm_valve.close-79"><a href="#rvm_valve.close-79"><span class="linenos">79</span></a><span class="w">        </span><span class="sd">'''</span>
+</span><span id="rvm_valve.close-80"><a href="#rvm_valve.close-80"><span class="linenos">80</span></a><span class="sd">        Closes connection to valve.</span>
+</span><span id="rvm_valve.close-81"><a href="#rvm_valve.close-81"><span class="linenos">81</span></a>
+</span><span id="rvm_valve.close-82"><a href="#rvm_valve.close-82"><span class="linenos">82</span></a><span class="sd">        Returns</span>
+</span><span id="rvm_valve.close-83"><a href="#rvm_valve.close-83"><span class="linenos">83</span></a><span class="sd">        -------</span>
+</span><span id="rvm_valve.close-84"><a href="#rvm_valve.close-84"><span class="linenos">84</span></a><span class="sd">        int</span>
+</span><span id="rvm_valve.close-85"><a href="#rvm_valve.close-85"><span class="linenos">85</span></a><span class="sd">            0 if executed successfully.</span>
+</span><span id="rvm_valve.close-86"><a href="#rvm_valve.close-86"><span class="linenos">86</span></a>
+</span><span id="rvm_valve.close-87"><a href="#rvm_valve.close-87"><span class="linenos">87</span></a><span class="sd">        '''</span>
+</span><span id="rvm_valve.close-88"><a href="#rvm_valve.close-88"><span class="linenos">88</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">valve</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span id="rvm_valve.close-89"><a href="#rvm_valve.close-89"><span class="linenos">89</span></a>        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'MUX connection closed'</span><span class="p">)</span>
+</span><span id="rvm_valve.close-90"><a href="#rvm_valve.close-90"><span class="linenos">90</span></a>        <span class="k">return</span> <span class="mi">0</span>
 </span></pre></div>
 
 
@@ -601,19 +630,19 @@ SOFTWARE.</p>
 
     </div>
     <a class="headerlink" href="#rvm_valve.home"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="rvm_valve.home-129"><a href="#rvm_valve.home-129"><span class="linenos">129</span></a>    <span class="k">def</span> <span class="nf">home</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="rvm_valve.home-130"><a href="#rvm_valve.home-130"><span class="linenos">130</span></a><span class="w">        </span><span class="sd">'''</span>
-</span><span id="rvm_valve.home-131"><a href="#rvm_valve.home-131"><span class="linenos">131</span></a><span class="sd">        Homes the valve</span>
-</span><span id="rvm_valve.home-132"><a href="#rvm_valve.home-132"><span class="linenos">132</span></a>
-</span><span id="rvm_valve.home-133"><a href="#rvm_valve.home-133"><span class="linenos">133</span></a><span class="sd">        Returns</span>
-</span><span id="rvm_valve.home-134"><a href="#rvm_valve.home-134"><span class="linenos">134</span></a><span class="sd">        -------</span>
-</span><span id="rvm_valve.home-135"><a href="#rvm_valve.home-135"><span class="linenos">135</span></a><span class="sd">        int</span>
-</span><span id="rvm_valve.home-136"><a href="#rvm_valve.home-136"><span class="linenos">136</span></a><span class="sd">            0 if executed successfully.</span>
-</span><span id="rvm_valve.home-137"><a href="#rvm_valve.home-137"><span class="linenos">137</span></a>
-</span><span id="rvm_valve.home-138"><a href="#rvm_valve.home-138"><span class="linenos">138</span></a><span class="sd">        '''</span>
-</span><span id="rvm_valve.home-139"><a href="#rvm_valve.home-139"><span class="linenos">139</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'ZR'</span><span class="p">)</span>
-</span><span id="rvm_valve.home-140"><a href="#rvm_valve.home-140"><span class="linenos">140</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_valve_position</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># update valve position</span>
-</span><span id="rvm_valve.home-141"><a href="#rvm_valve.home-141"><span class="linenos">141</span></a>        <span class="k">return</span> <span class="mi">0</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="rvm_valve.home-133"><a href="#rvm_valve.home-133"><span class="linenos">133</span></a>    <span class="k">def</span> <span class="nf">home</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="rvm_valve.home-134"><a href="#rvm_valve.home-134"><span class="linenos">134</span></a><span class="w">        </span><span class="sd">'''</span>
+</span><span id="rvm_valve.home-135"><a href="#rvm_valve.home-135"><span class="linenos">135</span></a><span class="sd">        Homes the valve</span>
+</span><span id="rvm_valve.home-136"><a href="#rvm_valve.home-136"><span class="linenos">136</span></a>
+</span><span id="rvm_valve.home-137"><a href="#rvm_valve.home-137"><span class="linenos">137</span></a><span class="sd">        Returns</span>
+</span><span id="rvm_valve.home-138"><a href="#rvm_valve.home-138"><span class="linenos">138</span></a><span class="sd">        -------</span>
+</span><span id="rvm_valve.home-139"><a href="#rvm_valve.home-139"><span class="linenos">139</span></a><span class="sd">        int</span>
+</span><span id="rvm_valve.home-140"><a href="#rvm_valve.home-140"><span class="linenos">140</span></a><span class="sd">            0 if executed successfully.</span>
+</span><span id="rvm_valve.home-141"><a href="#rvm_valve.home-141"><span class="linenos">141</span></a>
+</span><span id="rvm_valve.home-142"><a href="#rvm_valve.home-142"><span class="linenos">142</span></a><span class="sd">        '''</span>
+</span><span id="rvm_valve.home-143"><a href="#rvm_valve.home-143"><span class="linenos">143</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'ZR'</span><span class="p">)</span>
+</span><span id="rvm_valve.home-144"><a href="#rvm_valve.home-144"><span class="linenos">144</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_valve_position</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># update valve position</span>
+</span><span id="rvm_valve.home-145"><a href="#rvm_valve.home-145"><span class="linenos">145</span></a>        <span class="k">return</span> <span class="mi">0</span>
 </span></pre></div>
 
 
@@ -638,19 +667,19 @@ SOFTWARE.</p>
 
     </div>
     <a class="headerlink" href="#rvm_valve.abort"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="rvm_valve.abort-143"><a href="#rvm_valve.abort-143"><span class="linenos">143</span></a>    <span class="k">def</span> <span class="nf">abort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="rvm_valve.abort-144"><a href="#rvm_valve.abort-144"><span class="linenos">144</span></a><span class="w">        </span><span class="sd">'''</span>
-</span><span id="rvm_valve.abort-145"><a href="#rvm_valve.abort-145"><span class="linenos">145</span></a><span class="sd">        aborts movement (?)</span>
-</span><span id="rvm_valve.abort-146"><a href="#rvm_valve.abort-146"><span class="linenos">146</span></a><span class="sd">        command is not properly documented in mnaual so might not be functional</span>
-</span><span id="rvm_valve.abort-147"><a href="#rvm_valve.abort-147"><span class="linenos">147</span></a>
-</span><span id="rvm_valve.abort-148"><a href="#rvm_valve.abort-148"><span class="linenos">148</span></a><span class="sd">        Returns</span>
-</span><span id="rvm_valve.abort-149"><a href="#rvm_valve.abort-149"><span class="linenos">149</span></a><span class="sd">        -------</span>
-</span><span id="rvm_valve.abort-150"><a href="#rvm_valve.abort-150"><span class="linenos">150</span></a><span class="sd">        int</span>
-</span><span id="rvm_valve.abort-151"><a href="#rvm_valve.abort-151"><span class="linenos">151</span></a><span class="sd">            0 if executed successfully.</span>
-</span><span id="rvm_valve.abort-152"><a href="#rvm_valve.abort-152"><span class="linenos">152</span></a>
-</span><span id="rvm_valve.abort-153"><a href="#rvm_valve.abort-153"><span class="linenos">153</span></a><span class="sd">        '''</span>
-</span><span id="rvm_valve.abort-154"><a href="#rvm_valve.abort-154"><span class="linenos">154</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'T'</span><span class="p">)</span>
-</span><span id="rvm_valve.abort-155"><a href="#rvm_valve.abort-155"><span class="linenos">155</span></a>        <span class="k">return</span> <span class="mi">0</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="rvm_valve.abort-147"><a href="#rvm_valve.abort-147"><span class="linenos">147</span></a>    <span class="k">def</span> <span class="nf">abort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="rvm_valve.abort-148"><a href="#rvm_valve.abort-148"><span class="linenos">148</span></a><span class="w">        </span><span class="sd">'''</span>
+</span><span id="rvm_valve.abort-149"><a href="#rvm_valve.abort-149"><span class="linenos">149</span></a><span class="sd">        aborts movement (?)</span>
+</span><span id="rvm_valve.abort-150"><a href="#rvm_valve.abort-150"><span class="linenos">150</span></a><span class="sd">        command is not properly documented in mnaual so might not be functional</span>
+</span><span id="rvm_valve.abort-151"><a href="#rvm_valve.abort-151"><span class="linenos">151</span></a>
+</span><span id="rvm_valve.abort-152"><a href="#rvm_valve.abort-152"><span class="linenos">152</span></a><span class="sd">        Returns</span>
+</span><span id="rvm_valve.abort-153"><a href="#rvm_valve.abort-153"><span class="linenos">153</span></a><span class="sd">        -------</span>
+</span><span id="rvm_valve.abort-154"><a href="#rvm_valve.abort-154"><span class="linenos">154</span></a><span class="sd">        int</span>
+</span><span id="rvm_valve.abort-155"><a href="#rvm_valve.abort-155"><span class="linenos">155</span></a><span class="sd">            0 if executed successfully.</span>
+</span><span id="rvm_valve.abort-156"><a href="#rvm_valve.abort-156"><span class="linenos">156</span></a>
+</span><span id="rvm_valve.abort-157"><a href="#rvm_valve.abort-157"><span class="linenos">157</span></a><span class="sd">        '''</span>
+</span><span id="rvm_valve.abort-158"><a href="#rvm_valve.abort-158"><span class="linenos">158</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'T'</span><span class="p">)</span>
+</span><span id="rvm_valve.abort-159"><a href="#rvm_valve.abort-159"><span class="linenos">159</span></a>        <span class="k">return</span> <span class="mi">0</span>
 </span></pre></div>
 
 
@@ -676,42 +705,42 @@ command is not properly documented in mnaual so might not be functional</p>
 
     </div>
     <a class="headerlink" href="#rvm_valve.move"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="rvm_valve.move-157"><a href="#rvm_valve.move-157"><span class="linenos">157</span></a>    <span class="k">def</span> <span class="nf">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_channel</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-</span><span id="rvm_valve.move-158"><a href="#rvm_valve.move-158"><span class="linenos">158</span></a><span class="w">        </span><span class="sd">'''</span>
-</span><span id="rvm_valve.move-159"><a href="#rvm_valve.move-159"><span class="linenos">159</span></a><span class="sd">        Move valve to channel if not already at desired position</span>
-</span><span id="rvm_valve.move-160"><a href="#rvm_valve.move-160"><span class="linenos">160</span></a>
-</span><span id="rvm_valve.move-161"><a href="#rvm_valve.move-161"><span class="linenos">161</span></a><span class="sd">        Parameters</span>
-</span><span id="rvm_valve.move-162"><a href="#rvm_valve.move-162"><span class="linenos">162</span></a><span class="sd">        ----------</span>
-</span><span id="rvm_valve.move-163"><a href="#rvm_valve.move-163"><span class="linenos">163</span></a><span class="sd">        channel : int</span>
-</span><span id="rvm_valve.move-164"><a href="#rvm_valve.move-164"><span class="linenos">164</span></a><span class="sd">            Desired channel position.</span>
-</span><span id="rvm_valve.move-165"><a href="#rvm_valve.move-165"><span class="linenos">165</span></a><span class="sd">        </span>
-</span><span id="rvm_valve.move-166"><a href="#rvm_valve.move-166"><span class="linenos">166</span></a><span class="sd">        direction : int, optional</span>
-</span><span id="rvm_valve.move-167"><a href="#rvm_valve.move-167"><span class="linenos">167</span></a><span class="sd">            0 - shortest path,  1 - incrememtal, 2 - decremental. The default is 0.</span>
-</span><span id="rvm_valve.move-168"><a href="#rvm_valve.move-168"><span class="linenos">168</span></a>
-</span><span id="rvm_valve.move-169"><a href="#rvm_valve.move-169"><span class="linenos">169</span></a><span class="sd">        Returns</span>
-</span><span id="rvm_valve.move-170"><a href="#rvm_valve.move-170"><span class="linenos">170</span></a><span class="sd">        -------</span>
-</span><span id="rvm_valve.move-171"><a href="#rvm_valve.move-171"><span class="linenos">171</span></a><span class="sd">        int</span>
-</span><span id="rvm_valve.move-172"><a href="#rvm_valve.move-172"><span class="linenos">172</span></a><span class="sd">            New valve position. -1 if attempted to move valve beyond interval [1,2]</span>
-</span><span id="rvm_valve.move-173"><a href="#rvm_valve.move-173"><span class="linenos">173</span></a>
-</span><span id="rvm_valve.move-174"><a href="#rvm_valve.move-174"><span class="linenos">174</span></a><span class="sd">        '''</span>
-</span><span id="rvm_valve.move-175"><a href="#rvm_valve.move-175"><span class="linenos">175</span></a>        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_channel</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">13</span><span class="p">):</span>
-</span><span id="rvm_valve.move-176"><a href="#rvm_valve.move-176"><span class="linenos">176</span></a>            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">'asked MUX to move to position </span><span class="si">{</span>
-</span><span id="rvm_valve.move-177"><a href="#rvm_valve.move-177"><span class="linenos">177</span></a><span class="w">                            </span><span class="n">new_channel</span><span class="si">}</span><span class="s1"> which does not exist'</span><span class="p">)</span>
-</span><span id="rvm_valve.move-178"><a href="#rvm_valve.move-178"><span class="linenos">178</span></a>            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
-</span><span id="rvm_valve.move-179"><a href="#rvm_valve.move-179"><span class="linenos">179</span></a>
-</span><span id="rvm_valve.move-180"><a href="#rvm_valve.move-180"><span class="linenos">180</span></a>        <span class="n">new_channel</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">new_channel</span><span class="p">))</span>
-</span><span id="rvm_valve.move-181"><a href="#rvm_valve.move-181"><span class="linenos">181</span></a>        <span class="n">direction</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">direction</span><span class="p">))</span>
-</span><span id="rvm_valve.move-182"><a href="#rvm_valve.move-182"><span class="linenos">182</span></a>
-</span><span id="rvm_valve.move-183"><a href="#rvm_valve.move-183"><span class="linenos">183</span></a>        <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'0'</span><span class="p">:</span>
-</span><span id="rvm_valve.move-184"><a href="#rvm_valve.move-184"><span class="linenos">184</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'b'</span> <span class="o">+</span> <span class="n">new_channel</span> <span class="o">+</span> <span class="s1">'R'</span><span class="p">)</span>
-</span><span id="rvm_valve.move-185"><a href="#rvm_valve.move-185"><span class="linenos">185</span></a>        <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'1'</span><span class="p">:</span>
-</span><span id="rvm_valve.move-186"><a href="#rvm_valve.move-186"><span class="linenos">186</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'i'</span> <span class="o">+</span> <span class="n">new_channel</span> <span class="o">+</span> <span class="s1">'R'</span><span class="p">)</span>
-</span><span id="rvm_valve.move-187"><a href="#rvm_valve.move-187"><span class="linenos">187</span></a>        <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'2'</span><span class="p">:</span>
-</span><span id="rvm_valve.move-188"><a href="#rvm_valve.move-188"><span class="linenos">188</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'o'</span> <span class="o">+</span> <span class="n">new_channel</span> <span class="o">+</span> <span class="s1">'R'</span><span class="p">)</span>
-</span><span id="rvm_valve.move-189"><a href="#rvm_valve.move-189"><span class="linenos">189</span></a>
-</span><span id="rvm_valve.move-190"><a href="#rvm_valve.move-190"><span class="linenos">190</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_valve_position</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
-</span><span id="rvm_valve.move-191"><a href="#rvm_valve.move-191"><span class="linenos">191</span></a>            <span class="n">new_channel</span><span class="p">)</span>  <span class="c1"># update valve position</span>
-</span><span id="rvm_valve.move-192"><a href="#rvm_valve.move-192"><span class="linenos">192</span></a>        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_channel</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="rvm_valve.move-161"><a href="#rvm_valve.move-161"><span class="linenos">161</span></a>    <span class="k">def</span> <span class="nf">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_channel</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+</span><span id="rvm_valve.move-162"><a href="#rvm_valve.move-162"><span class="linenos">162</span></a><span class="w">        </span><span class="sd">'''</span>
+</span><span id="rvm_valve.move-163"><a href="#rvm_valve.move-163"><span class="linenos">163</span></a><span class="sd">        Move valve to channel if not already at desired position</span>
+</span><span id="rvm_valve.move-164"><a href="#rvm_valve.move-164"><span class="linenos">164</span></a>
+</span><span id="rvm_valve.move-165"><a href="#rvm_valve.move-165"><span class="linenos">165</span></a><span class="sd">        Parameters</span>
+</span><span id="rvm_valve.move-166"><a href="#rvm_valve.move-166"><span class="linenos">166</span></a><span class="sd">        ----------</span>
+</span><span id="rvm_valve.move-167"><a href="#rvm_valve.move-167"><span class="linenos">167</span></a><span class="sd">        channel : int</span>
+</span><span id="rvm_valve.move-168"><a href="#rvm_valve.move-168"><span class="linenos">168</span></a><span class="sd">            Desired channel position.</span>
+</span><span id="rvm_valve.move-169"><a href="#rvm_valve.move-169"><span class="linenos">169</span></a><span class="sd">        </span>
+</span><span id="rvm_valve.move-170"><a href="#rvm_valve.move-170"><span class="linenos">170</span></a><span class="sd">        direction : int, optional</span>
+</span><span id="rvm_valve.move-171"><a href="#rvm_valve.move-171"><span class="linenos">171</span></a><span class="sd">            0 - shortest path,  1 - incrememtal, 2 - decremental. The default is 0.</span>
+</span><span id="rvm_valve.move-172"><a href="#rvm_valve.move-172"><span class="linenos">172</span></a>
+</span><span id="rvm_valve.move-173"><a href="#rvm_valve.move-173"><span class="linenos">173</span></a><span class="sd">        Returns</span>
+</span><span id="rvm_valve.move-174"><a href="#rvm_valve.move-174"><span class="linenos">174</span></a><span class="sd">        -------</span>
+</span><span id="rvm_valve.move-175"><a href="#rvm_valve.move-175"><span class="linenos">175</span></a><span class="sd">        int</span>
+</span><span id="rvm_valve.move-176"><a href="#rvm_valve.move-176"><span class="linenos">176</span></a><span class="sd">            New valve position. -1 if attempted to move valve beyond number of available ports</span>
+</span><span id="rvm_valve.move-177"><a href="#rvm_valve.move-177"><span class="linenos">177</span></a>
+</span><span id="rvm_valve.move-178"><a href="#rvm_valve.move-178"><span class="linenos">178</span></a><span class="sd">        '''</span>
+</span><span id="rvm_valve.move-179"><a href="#rvm_valve.move-179"><span class="linenos">179</span></a>        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_channel</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_ports</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+</span><span id="rvm_valve.move-180"><a href="#rvm_valve.move-180"><span class="linenos">180</span></a>            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">'asked MUX to move to position </span><span class="si">{</span>
+</span><span id="rvm_valve.move-181"><a href="#rvm_valve.move-181"><span class="linenos">181</span></a><span class="w">                            </span><span class="n">new_channel</span><span class="si">}</span><span class="s1"> which does not exist'</span><span class="p">)</span>
+</span><span id="rvm_valve.move-182"><a href="#rvm_valve.move-182"><span class="linenos">182</span></a>            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+</span><span id="rvm_valve.move-183"><a href="#rvm_valve.move-183"><span class="linenos">183</span></a>
+</span><span id="rvm_valve.move-184"><a href="#rvm_valve.move-184"><span class="linenos">184</span></a>        <span class="n">new_channel</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">new_channel</span><span class="p">))</span>
+</span><span id="rvm_valve.move-185"><a href="#rvm_valve.move-185"><span class="linenos">185</span></a>        <span class="n">direction</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">direction</span><span class="p">))</span>
+</span><span id="rvm_valve.move-186"><a href="#rvm_valve.move-186"><span class="linenos">186</span></a>
+</span><span id="rvm_valve.move-187"><a href="#rvm_valve.move-187"><span class="linenos">187</span></a>        <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'0'</span><span class="p">:</span>
+</span><span id="rvm_valve.move-188"><a href="#rvm_valve.move-188"><span class="linenos">188</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'b'</span> <span class="o">+</span> <span class="n">new_channel</span> <span class="o">+</span> <span class="s1">'R'</span><span class="p">)</span>
+</span><span id="rvm_valve.move-189"><a href="#rvm_valve.move-189"><span class="linenos">189</span></a>        <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'1'</span><span class="p">:</span>
+</span><span id="rvm_valve.move-190"><a href="#rvm_valve.move-190"><span class="linenos">190</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'i'</span> <span class="o">+</span> <span class="n">new_channel</span> <span class="o">+</span> <span class="s1">'R'</span><span class="p">)</span>
+</span><span id="rvm_valve.move-191"><a href="#rvm_valve.move-191"><span class="linenos">191</span></a>        <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s1">'2'</span><span class="p">:</span>
+</span><span id="rvm_valve.move-192"><a href="#rvm_valve.move-192"><span class="linenos">192</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'o'</span> <span class="o">+</span> <span class="n">new_channel</span> <span class="o">+</span> <span class="s1">'R'</span><span class="p">)</span>
+</span><span id="rvm_valve.move-193"><a href="#rvm_valve.move-193"><span class="linenos">193</span></a>
+</span><span id="rvm_valve.move-194"><a href="#rvm_valve.move-194"><span class="linenos">194</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">current_valve_position</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+</span><span id="rvm_valve.move-195"><a href="#rvm_valve.move-195"><span class="linenos">195</span></a>            <span class="n">new_channel</span><span class="p">)</span>  <span class="c1"># update valve position</span>
+</span><span id="rvm_valve.move-196"><a href="#rvm_valve.move-196"><span class="linenos">196</span></a>        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">new_channel</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -728,7 +757,7 @@ command is not properly documented in mnaual so might not be functional</p>
 <h2 id="returns">Returns</h2>
 
 <p>int
-    New valve position. -1 if attempted to move valve beyond interval [1,2]</p>
+    New valve position. -1 if attempted to move valve beyond number of available ports</p>
 </div>
 
 
@@ -744,19 +773,19 @@ command is not properly documented in mnaual so might not be functional</p>
 
     </div>
     <a class="headerlink" href="#rvm_valve.get_valve_postion"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="rvm_valve.get_valve_postion-194"><a href="#rvm_valve.get_valve_postion-194"><span class="linenos">194</span></a>    <span class="k">def</span> <span class="nf">get_valve_postion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="rvm_valve.get_valve_postion-195"><a href="#rvm_valve.get_valve_postion-195"><span class="linenos">195</span></a><span class="w">        </span><span class="sd">'''</span>
-</span><span id="rvm_valve.get_valve_postion-196"><a href="#rvm_valve.get_valve_postion-196"><span class="linenos">196</span></a><span class="sd">        Reads the current valve position.</span>
-</span><span id="rvm_valve.get_valve_postion-197"><a href="#rvm_valve.get_valve_postion-197"><span class="linenos">197</span></a><span class="sd">        Work in progress, needs proper way to handle response, currently does nothing.</span>
-</span><span id="rvm_valve.get_valve_postion-198"><a href="#rvm_valve.get_valve_postion-198"><span class="linenos">198</span></a>
-</span><span id="rvm_valve.get_valve_postion-199"><a href="#rvm_valve.get_valve_postion-199"><span class="linenos">199</span></a><span class="sd">        Returns</span>
-</span><span id="rvm_valve.get_valve_postion-200"><a href="#rvm_valve.get_valve_postion-200"><span class="linenos">200</span></a><span class="sd">        -------</span>
-</span><span id="rvm_valve.get_valve_postion-201"><a href="#rvm_valve.get_valve_postion-201"><span class="linenos">201</span></a><span class="sd">        int</span>
-</span><span id="rvm_valve.get_valve_postion-202"><a href="#rvm_valve.get_valve_postion-202"><span class="linenos">202</span></a><span class="sd">            0 if executed successfully.</span>
-</span><span id="rvm_valve.get_valve_postion-203"><a href="#rvm_valve.get_valve_postion-203"><span class="linenos">203</span></a>
-</span><span id="rvm_valve.get_valve_postion-204"><a href="#rvm_valve.get_valve_postion-204"><span class="linenos">204</span></a><span class="sd">        '''</span>
-</span><span id="rvm_valve.get_valve_postion-205"><a href="#rvm_valve.get_valve_postion-205"><span class="linenos">205</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'?6'</span><span class="p">)</span>
-</span><span id="rvm_valve.get_valve_postion-206"><a href="#rvm_valve.get_valve_postion-206"><span class="linenos">206</span></a>        <span class="k">return</span> <span class="mi">0</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="rvm_valve.get_valve_postion-198"><a href="#rvm_valve.get_valve_postion-198"><span class="linenos">198</span></a>    <span class="k">def</span> <span class="nf">get_valve_postion</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="rvm_valve.get_valve_postion-199"><a href="#rvm_valve.get_valve_postion-199"><span class="linenos">199</span></a><span class="w">        </span><span class="sd">'''</span>
+</span><span id="rvm_valve.get_valve_postion-200"><a href="#rvm_valve.get_valve_postion-200"><span class="linenos">200</span></a><span class="sd">        Reads the current valve position.</span>
+</span><span id="rvm_valve.get_valve_postion-201"><a href="#rvm_valve.get_valve_postion-201"><span class="linenos">201</span></a><span class="sd">        Work in progress, needs proper way to handle response, currently does nothing.</span>
+</span><span id="rvm_valve.get_valve_postion-202"><a href="#rvm_valve.get_valve_postion-202"><span class="linenos">202</span></a>
+</span><span id="rvm_valve.get_valve_postion-203"><a href="#rvm_valve.get_valve_postion-203"><span class="linenos">203</span></a><span class="sd">        Returns</span>
+</span><span id="rvm_valve.get_valve_postion-204"><a href="#rvm_valve.get_valve_postion-204"><span class="linenos">204</span></a><span class="sd">        -------</span>
+</span><span id="rvm_valve.get_valve_postion-205"><a href="#rvm_valve.get_valve_postion-205"><span class="linenos">205</span></a><span class="sd">        int</span>
+</span><span id="rvm_valve.get_valve_postion-206"><a href="#rvm_valve.get_valve_postion-206"><span class="linenos">206</span></a><span class="sd">            0 if executed successfully.</span>
+</span><span id="rvm_valve.get_valve_postion-207"><a href="#rvm_valve.get_valve_postion-207"><span class="linenos">207</span></a>
+</span><span id="rvm_valve.get_valve_postion-208"><a href="#rvm_valve.get_valve_postion-208"><span class="linenos">208</span></a><span class="sd">        '''</span>
+</span><span id="rvm_valve.get_valve_postion-209"><a href="#rvm_valve.get_valve_postion-209"><span class="linenos">209</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'?6'</span><span class="p">)</span>
+</span><span id="rvm_valve.get_valve_postion-210"><a href="#rvm_valve.get_valve_postion-210"><span class="linenos">210</span></a>        <span class="k">return</span> <span class="mi">0</span>
 </span></pre></div>
 
 
@@ -775,7 +804,7 @@ Work in progress, needs proper way to handle response, currently does nothing.</
     </main>
 <script>
     /* Periodically check with the pdoc server if there have been any changes. */
-    let mtime_generated = "1709141178.6",
+    let mtime_generated = "1709141784.3",
         url = new URL(window.location);
     url.searchParams.set("mtime", 1);
     window.setInterval(function () {

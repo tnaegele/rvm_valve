@@ -45,7 +45,7 @@ class rvm_valve():
     '''
     This driver controls OEM AVM rotary valves from Advanced Microfluidics.
     '''
-    def __init__(self, port):
+    def __init__(self, port, number_of_ports=12):
         '''
         Initialise valve control
 
@@ -53,6 +53,9 @@ class rvm_valve():
         ----------
         port : str
             Port of valve, e.g. 'COM2' on Windows or device path of Linux / MacOS
+            
+        number_of_ports : int, optional
+            Number of valve ports. The default is 12.
 
         Returns
         -------
@@ -61,6 +64,7 @@ class rvm_valve():
         '''
         self.valve = serial.Serial(port, 9600, timeout=1000)
         logging.info(f'connected to RVM valve {self.valve.name}')
+        self.number_of_ports = number_of_ports
         self.current_valve_position = 1  # keeps track of the valve position
         self.home()
 
@@ -168,10 +172,10 @@ class rvm_valve():
         Returns
         -------
         int
-            New valve position. -1 if attempted to move valve beyond interval [1,2]
+            New valve position. -1 if attempted to move valve beyond number of available ports
 
         '''
-        if int(new_channel) not in range(1,13):
+        if int(new_channel) not in range(1,self.number_of_ports+1):
             logging.warning(f'asked MUX to move to position {
                             new_channel} which does not exist')
             return -1

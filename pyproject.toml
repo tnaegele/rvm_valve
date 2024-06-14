@@ -1,5 +1,5 @@
 [project]
-name = "srvm_valve"
+name = "rvm_valve"
 version = "1.0.0"
 authors = [
   { name="Tobias E. Naegele", email="github@tobiasnaegele.com" },

@@ -1,12 +1,15 @@
 # rvm_valve
 Python driver for the [Advanced Microfluidics OEM AVM rotary valve](https://amf.ch/product/rvm-microfluidic-electric-rotary-valve/). This driver *might* also work with the [Elveflow microfluidic distribution valve (MUX)](https://www.elveflow.com/microfluidic-products/microfluidics-flow-control-systems/mux-distrib/) which internally uses the same hardware.
 
-## Usage
-Just clone this repo and create a virtualenv which fulfils the requirements from requirements.txt. 
+## Installation
+It is recommended to create and activate a virtual environment before installation.
+~~~bash
+pip install rvm-valve
+~~~
 
 API documentation can be found at: https://tnaegele.github.io/rvm_valve
 
-Example code:
+## Example:
 ~~~python
 import rvm_valve
 import time
@@ -18,12 +21,6 @@ with rvm_valve.rvm_valve('COM7') as valve:
     valve.move(5)
     time.sleep(3)
     valve.move(4,direction=1)
-~~~
-
-## Installation
-It is recommended to create and activate a virtual environment before installation.
-~~~bash
-pip install rvm-valve
 ~~~
 
 ## Todo

@@ -1,0 +1,27 @@
+[project]
+name = "srvm_valve"
+version = "1.0.0"
+authors = [
+  { name="Tobias E. Naegele", email="github@tobiasnaegele.com" },
+]
+description = "Python driver for the Advanced Microfluidics OEM AVM rotary valve. "
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent"
+]
+
+dependencies = [
+  "pyserial==3.5"
+]
+
+[project.urls]
+Homepage = "https://github.com/tnaegele/rvm_valve"
+Issues = "https://github.com/tnaegele/rvm_valve/issues"
+
+[build-system]
+requires = ["setuptools>=70.0"]
+build-backend = "setuptools.build_meta"

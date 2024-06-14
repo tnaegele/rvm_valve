@@ -20,6 +20,12 @@ with rvm_valve.rvm_valve('COM7') as valve:
     valve.move(4,direction=1)
 ~~~
 
+## Installation
+It is recommended to create and activate a virtual environment before installation.
+~~~bash
+pip install rvm-valve
+~~~
+
 ## Todo
 - add proper handling of responses from valve with method `_handle_reply()`
 - make `get_valve_position()` method functional

@@ -1,4 +1,4 @@
-# rvm_valve_control
+# rvm_valve
 Python driver for the [Advanced Microfluidics OEM AVM rotary valve](https://amf.ch/product/rvm-microfluidic-electric-rotary-valve/). This driver *might* also work with the [Elveflow microfluidic distribution valve (MUX)](https://www.elveflow.com/microfluidic-products/microfluidics-flow-control-systems/mux-distrib/) which internally uses the same hardware.
 
 ## Usage
